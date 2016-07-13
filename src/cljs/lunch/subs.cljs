@@ -1,6 +1,8 @@
 (ns lunch.subs
     (:require-macros [reagent.ratom :refer [reaction]])
-    (:require [re-frame.core :as re-frame]))
+
+    (:require [re-frame.core :as re-frame]
+              [reagent.core :as reagent]))
 
 (re-frame/register-sub
  :name
@@ -16,3 +18,13 @@
   :query
   (fn [db _]
     (reaction (:query @db))))
+
+(re-frame/register-sub
+ :search-result
+ (fn [db _]
+   (reaction (:search-result @db))))
+
+(re-frame/register-sub
+ :url-params
+ (fn [db _]
+   (reaction (:url-params @db))))

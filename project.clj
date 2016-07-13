@@ -10,6 +10,7 @@
                  [ring "1.4.0"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
+            [cider/cider-nrepl "0.12.0"]
             [lein-less "1.7.5"]]
 
   :min-lein-version "2.5.3"
