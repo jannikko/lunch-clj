@@ -1,7 +1,12 @@
 (ns lunch.handlers
-    (:require [re-frame.core :as re-frame :refer [dispatch]]
-              [clojure.string :as string]
-              [lunch.db :as db]))
+  (:require-macros [cljs.core.async.macros :refer [go]]
+                   [secretary.core :refer [defroute]])
+  (:require [re-frame.core :as re-frame :refer [dispatch]]
+            [cljs.core.async :as async :refer [<! >! put! chan]]
+            [clojure.string :as string]
+            [lunch.util :as util :refer [GET]]
+            [lunch.routes :as routes]
+            [lunch.db :as db]))
 
 
 (defn request-places-service
@@ -25,7 +30,8 @@
 (re-frame/register-handler
  :location-response
  (fn [db [_ location]]
- (assoc db :location location)))
+   (dispatch [:request-places-service])
+   (assoc db :location location)))
 
 (re-frame/register-handler
  :handle-places-search-result
@@ -67,4 +73,17 @@
    (assoc db :places-service (js/google.maps.places.PlacesService. node))))
 
 
+(re-frame/register-handler
+ :initialize-detail-view
+ (fn [db [_ params]]
+   (go
+     ;;TODO replace with server route
+     (let [result (<! (GET "/place" {"id" (:id params)}))]
+       (dispatch [:handle-place-response result])))
+   db))
 
+(re-frame/register-handler
+ :handle-place-response
+ (fn [db [_ response]]
+   (println response)
+   db))

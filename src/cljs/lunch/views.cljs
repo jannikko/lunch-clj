@@ -36,7 +36,7 @@
     (fn []
       [:div [:h1 "What would you like to eat today?"]
        [:div [:input {:type "text" :value @query :on-change #(dispatch [:search-input-changed (-> % .-target .-value)])}]
-        [:button {:value "Location" :on-click #(dispatch [:location-request])} "My Location"]
+        [:button {:value "Location" :on-click #(do (dispatch [:location-request]))} "My Location"]
         [places-service-node]
         [search-results]]
        ])))
@@ -44,13 +44,23 @@
 
 ;; detail
 
-(defn detail-panel []
+
+(defn detail-panel-render []
   (let [params (re-frame/subscribe [:url-params])]
       (fn []
-        (println params)
         [:div (str "This is the Detail Page for: " (:id @params))
          [:div [:a {:href "#/"} "go to Home Page"]]])))
 
+(defn detail-panel-did-mount
+  [this]
+  (let [params (re-frame/subscribe [:url-params])]
+      (dispatch [:initialize-detail-view @params])))
+
+
+(defn detail-panel []
+  (reagent/create-class {:reagent-render detail-panel-render
+                         :component-did-mount detail-panel-did-mount
+                         }))
 
 ;; main
 
