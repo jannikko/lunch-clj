@@ -1,13 +1,19 @@
 (ns lunch.handler
-  (:require [compojure.core :refer [GET defroutes]]
-            [compojure.route :refer [resources]]
-            [ring.util.response :refer [resource-response]]
+  (:require [ring.util.response :as res :refer [resource-response]]
+            [bidi.ring :refer [make-handler]]
             [ring.middleware.reload :refer [wrap-reload]]))
 
-(defroutes routes
-  (GET "/" [] (resource-response "index.html" {:root "public"}))
-  (resources "/"))
+(defn index-handler
+  [request]
+  (resource-response "index.html" {:root "public"}))
 
-(def dev-handler (-> #'routes wrap-reload))
+(defn article-handler
+  [{:keys [route-params]}]
+  (res/response (str "You are viewing article: " (:id route-params))))
 
-(def handler routes)
+(def handler
+  (make-handler ["/" {"" index-handler
+                      ["articles/" :id "/article.html"] article-handler}]))
+
+
+(def dev-handler (-> handler wrap-reload))

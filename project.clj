@@ -6,6 +6,7 @@
                  [re-frame "0.7.0"]
                  [secretary "1.2.3"]
                  [compojure "1.5.0"]
+                 [bidi "2.0.9"]
                  [org.clojure/core.async "0.2.374"]
                  [cljs-http "0.1.41"]
                  [yogthos/config "0.8"]
