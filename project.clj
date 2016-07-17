@@ -36,7 +36,7 @@
   :profiles
   {:dev
    {:dependencies []
-
+    :resource-paths ["src/config/dev"]
     :plugins      [[lein-figwheel "0.5.4-3"]]
     }}
 

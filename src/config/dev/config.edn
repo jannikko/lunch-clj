@@ -1,0 +1,2 @@
+{:port "3500"
+ :db-uri "postgresql://lunch:lunch@localhost/lunch"}
