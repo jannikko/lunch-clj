@@ -10,6 +10,8 @@
                  [org.clojure/core.async "0.2.374"]
                  [cljs-http "0.1.41"]
                  [yogthos/config "0.8"]
+		 [postgresql "9.3-1102.jdbc41"]
+                 [ragtime "0.6.0"]
                  [ring "1.4.0"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
@@ -17,6 +19,9 @@
             [lein-less "1.7.5"]]
 
   :min-lein-version "2.5.3"
+
+  :aliases {"migrate"  ["run" "-m" "user/migrate"]
+            "rollback" ["run" "-m" "user/rollback"]}
 
   :source-paths ["src/clj"]
 

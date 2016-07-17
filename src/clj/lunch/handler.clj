@@ -13,7 +13,8 @@
 
 (def handler
   (make-handler ["/" {"" index-handler
-                      ["articles/" :id "/article.html"] article-handler}]))
-
+                      "api/" {"place" article-handler}}]))
 
 (def dev-handler (-> handler wrap-reload))
+
+

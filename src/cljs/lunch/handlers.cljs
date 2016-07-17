@@ -78,7 +78,7 @@
  (fn [db [_ params]]
    (go
      ;;TODO replace with server route
-     (let [result (<! (GET "/place" {"id" (:id params)}))]
+     (let [result (<! (GET "/api/place" {"id" (:id params)}))]
        (dispatch [:handle-place-response result])))
    db))
 
