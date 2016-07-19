@@ -12,10 +12,6 @@
   [{:keys [route-params]}]
   (res/response (str "You are viewing article: " (:id route-params))))
 
-(defn resource-handler
-  [request]
-  (resource-response (:uri request) {:root "public"}))
-
 (def routing-table
   ["/" {"" :index
         "api/" {["place/" :id] :api-place}}])

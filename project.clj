@@ -10,7 +10,7 @@
                  [org.clojure/core.async "0.2.374"]
                  [cljs-http "0.1.41"]
                  [yogthos/config "0.8"]
-		 [postgresql "9.3-1102.jdbc41"]
+                 [postgresql "9.3-1102.jdbc41"]
                  [ragtime "0.6.0"]
                  [ring "1.4.0"]]
 
@@ -56,6 +56,7 @@
      :jar true
      :compiler     {:main            lunch.core
                     :output-to       "resources/public/js/compiled/app.js"
+                    ;; Need externs for advanced compilation
                     :optimizations   :advanced
                     :closure-defines {goog.DEBUG false}
                     :pretty-print    false}}
