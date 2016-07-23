@@ -10,4 +10,3 @@
   ([c endpoint params]
    (http/get endpoint {:query-params params
                        :channel c})))
-

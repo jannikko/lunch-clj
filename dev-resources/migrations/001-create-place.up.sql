@@ -1,4 +1,4 @@
-CREATE TABLE menu (
+CREATE TABLE place (
   id VARCHAR(255) PRIMARY KEY,
   menuFilePath VARCHAR(255)
 );

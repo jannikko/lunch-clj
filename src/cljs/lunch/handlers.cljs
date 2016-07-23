@@ -6,6 +6,7 @@
             [clojure.string :as string]
             [lunch.util :as util :refer [GET]]
             [lunch.routes :as routes]
+            [lunch.api.place :as place-api]
             [lunch.db :as db]))
 
 
@@ -77,8 +78,7 @@
  :initialize-detail-view
  (fn [db [_ params]]
    (go
-     ;;TODO replace with server route
-     (let [result (<! (GET "/api/place" {"id" (:id params)}))]
+     (let [result (place-api/get-one (:id params))]
        (dispatch [:handle-place-response result])))
    db))
 

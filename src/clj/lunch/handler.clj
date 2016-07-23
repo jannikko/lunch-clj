@@ -1,32 +1,32 @@
 (ns lunch.handler
-  (:require [ring.util.response :as res :refer [resource-response]]
-            [bidi.ring :refer [make-handler files]]
-            [ring.middleware.resource :refer [wrap-resource]]
+  (:require [ring.util.response :as res :refer [resource-response content-type]]
+            [compojure.core :refer :all]
+            [compojure.route :as route]
+            [ring.middleware.defaults :refer :all]
             [ring.middleware.reload :refer [wrap-reload]]))
 
-(defn index-handler
-  [request]
-  (resource-response "index.html" {:root "public"}))
+(defn place-download [id]
+  (res/response (str "You are viewing article: " id)))
 
-(defn article-handler
-  [{:keys [route-params]}]
-  (res/response (str "You are viewing article: " (:id route-params))))
+(defn place-upload [request]
+  (res/response (str "You are viewing article: " request)))
 
-(def routing-table
-  ["/" {"" :index
-        "api/" {["place/" :id] :api-place}}])
+(defn api-routes [request]
+  (routes
+   (GET "/place/:id" [id] (place-download id))
+   (POST "/place/:id" request (place-upload request))
+   ))
 
-(def handler-map
-  {:index index-handler
-   :api-place article-handler
-   })
+(defroutes app-routes
+  (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
+  (context "/api" [request] (api-routes request))
+  (route/resources "/")
+  (route/not-found "Page not found"))
 
-(def routes-handler
-  (make-handler routing-table handler-map))
-
-(def handler
-  (-> routes-handler
-      (wrap-resource "public")))
+(def handler (->
+              app-routes
+              (wrap-defaults api-defaults)
+              ))
 
 (def dev-handler (-> handler wrap-reload))
 

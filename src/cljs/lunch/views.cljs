@@ -1,6 +1,7 @@
 (ns lunch.views
   (:require [re-frame.core :as re-frame :refer [dispatch]]
             [reagent.core :as reagent]
+            [lunch.api.endpoints :as endpoints]
             [lunch.routes :refer [detail-route]]
             ))
 
@@ -49,7 +50,8 @@
   (let [params (re-frame/subscribe [:url-params])]
       (fn []
         [:div (str "This is the Detail Page for: " (:id @params))
-         [:div [:a {:href "#/"} "go to Home Page"]]])))
+         [:div [:a {:href "#/"} "go to Home Page"]]
+         [:form {:method "POST" :action (endpoints/place (:id @params))} [:input {:type "file" :name "file"}] [:input {:type "submit"} "Submit"]]])))
 
 (defn detail-panel-did-mount
   [this]
