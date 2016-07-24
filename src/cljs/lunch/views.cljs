@@ -1,7 +1,6 @@
 (ns lunch.views
   (:require [re-frame.core :as re-frame :refer [dispatch]]
             [reagent.core :as reagent]
-            [lunch.api.endpoints :as endpoints]
             [lunch.routes :refer [detail-route]]
             ))
 
@@ -32,26 +31,39 @@
 
 ;; home
 
-(defn home-panel[]
+(defn home-panel-did-mount
+  [this]
+  (let [params (re-frame/subscribe [:url-params])]
+    (dispatch [:initialize-home-view @params])))
+
+(defn home-panel-render[]
   (let [query (re-frame/subscribe [:query])]
     (fn []
       [:div [:h1 "What would you like to eat today?"]
        [:div [:input {:type "text" :value @query :on-change #(dispatch [:search-input-changed (-> % .-target .-value)])}]
-        [:button {:value "Location" :on-click #(do (dispatch [:location-request]))} "My Location"]
+        [:button {:value "Location" :on-click #(dispatch [:location-request])} "My Location"]
         [places-service-node]
         [search-results]]
        ])))
 
 
+(defn home-panel []
+  (reagent/create-class {:reagent-render home-panel-render
+                         :component-did-mount home-panel-did-mount
+                         }))
+
 ;; detail
 
 
 (defn detail-panel-render []
-  (let [params (re-frame/subscribe [:url-params])]
-      (fn []
-        [:div (str "This is the Detail Page for: " (:id @params))
-         [:div [:a {:href "#/"} "go to Home Page"]]
-         [:form {:method "POST" :action (endpoints/place (:id @params))} [:input {:type "file" :name "file"}] [:input {:type "submit"} "Submit"]]])))
+  (let [place-id (re-frame/subscribe [:place-id])]
+    (fn []
+      [:div (str "This is the Detail Page for: " @place-id)
+       [:div [:a {:href "#/"} "go to Home Page"]]
+       [:input {:type "file" :id "file"}]
+       [:button
+        {:on-click #(dispatch [:handle-file-submit
+                               (-> "file" (js/document.getElementById) .-files (aget 0))])} "Submit"]])))
 
 (defn detail-panel-did-mount
   [this]

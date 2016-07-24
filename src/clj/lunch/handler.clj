@@ -9,6 +9,7 @@
   (res/response (str "You are viewing article: " id)))
 
 (defn place-upload [request]
+  (println request)
   (res/response (str "You are viewing article: " request)))
 
 (defn api-routes [request]

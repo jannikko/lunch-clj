@@ -17,6 +17,22 @@
      (.textSearch service (clj->js {"query" query "location" location})
                   #(dispatch [:handle-places-search-result %])))))
 
+;; Initialize the default db
+
+(re-frame/register-handler
+ :initialize-db
+ (fn  [_ _]
+   db/default-db))
+
+
+;; Routing handler
+
+(re-frame/register-handler
+ :set-active-panel
+ (fn [db [_ active-panel params]]
+   (assoc db :active-panel active-panel :url-params params)))
+
+;; Geolocation
 
 (re-frame/register-handler
  :location-request
@@ -34,25 +50,35 @@
    (dispatch [:request-places-service])
    (assoc db :location location)))
 
+;; Google Maps Search
+
+(re-frame/register-handler
+ :initialize-places-service
+ (fn [db [_ node]]
+   (assoc db :places-service (js/google.maps.places.PlacesService. node))))
+
+(re-frame/register-handler
+ :request-places-service
+ (fn [{:keys [places-service view location] :as db} [_ _]]
+   (request-places-service places-service (:query view) location)
+   db))
+
 (re-frame/register-handler
  :handle-places-search-result
  (fn [db [_ result]]
-   (assoc db :search-result (js->clj result :keywordize-keys true))))
+   (assoc-in db [:view :search-result] (js->clj result :keywordize-keys true))))
 
 (re-frame/register-handler
  :reset-places-search-result
  (fn [db [_ _]]
-   (dissoc db :search-result)))
+   (update-in db [:view] dissoc :search-result)))
+
+;; Home view handlers
 
 (re-frame/register-handler
- :initialize-db
- (fn  [_ _]
-   db/default-db))
-
-(re-frame/register-handler
- :set-active-panel
- (fn [db [_ active-panel params]]
-   (assoc db :active-panel active-panel :url-params params)))
+ :initialize-home-view
+ (fn [db [_ params]]
+   (assoc db :view {:query "" :search-result []})))
 
 (re-frame/register-handler
  :search-input-changed
@@ -60,30 +86,45 @@
    (if (string/blank? input)
      (dispatch [:reset-places-search-result])
      (dispatch [:request-places-service]))
-     (assoc db :query input)))
+   (assoc-in db [:view :query] input)))
 
-(re-frame/register-handler
- :request-places-service
- (fn [{:keys [places-service query location] :as db} [_ _]]
-   (request-places-service places-service query location)
-   db))
-
-(re-frame/register-handler
- :initialize-places-service
- (fn [db [_ node]]
-   (assoc db :places-service (js/google.maps.places.PlacesService. node))))
-
+;; Detail view handlers
 
 (re-frame/register-handler
  :initialize-detail-view
  (fn [db [_ params]]
    (go
-     (let [result (place-api/get-one (:id params))]
+     (let [result (<! (place-api/get-one (:id params)))]
        (dispatch [:handle-place-response result])))
-   db))
+   (assoc-in db [:view :place-id] (:id params))))
+
 
 (re-frame/register-handler
  :handle-place-response
  (fn [db [_ response]]
-   (println response)
+   db))
+
+(re-frame/register-handler
+ :handle-file-upload-response
+ (fn [db [_ status]]
+   (.log js/console status)
+   db))
+
+(re-frame/register-handler
+ :handle-file-loaded
+ (fn [db [_ file-content]]
+   (go
+     (let [result (place-api/post-one (-> db :view :place-id) file-content)]
+       (dispatch [:handle-file-upload-response (<! result)])))
+   db))
+
+(re-frame/register-handler
+ :handle-file-submit
+ (fn [db [_ file]]
+   (if file
+     (let [reader (new js/FileReader)]
+       (.readAsBinaryString reader file)
+       (aset reader "onload" #(dispatch [:handle-file-loaded (.. % -target -result)]))
+       (aset reader "onerror" #(dispatch [:handle-file-error]))
+       ))
    db))

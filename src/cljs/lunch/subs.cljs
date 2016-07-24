@@ -17,12 +17,17 @@
 (re-frame/register-sub
   :query
   (fn [db _]
-    (reaction (:query @db))))
+    (reaction (get-in @db [:view :query]))))
 
 (re-frame/register-sub
  :search-result
  (fn [db _]
-   (reaction (:search-result @db))))
+   (reaction (get-in @db [:view :search-result]))))
+
+(re-frame/register-sub
+ :place-id
+ (fn [db _]
+   (reaction (get-in @db [:view :place-id]))))
 
 (re-frame/register-sub
  :url-params

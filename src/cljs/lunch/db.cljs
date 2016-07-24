@@ -1,4 +1,8 @@
 (ns lunch.db)
 
 (def default-db
-  {:name "re-frame" :query "" :search-result []})
+  {:name "re-frame"
+   :view {}
+   :url-params {}
+   :services {}
+   })
