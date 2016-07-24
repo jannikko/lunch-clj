@@ -11,6 +11,6 @@
   [id]
   (GET (place id)))
 
-(defn post-one
+(defn upload
   [id file]
-  (http/post (place id) {:multipart-params [["file" file]]}))
+  (http/post (str (place id) "/upload") {:multipart-params [["file" file]]}))
