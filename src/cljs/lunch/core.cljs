@@ -2,6 +2,7 @@
     (:require [reagent.core :as reagent]
               [re-frame.core :as re-frame]
               [devtools.core :as devtools]
+              [lunch.api]
               [lunch.handlers]
               [lunch.subs]
               [lunch.routes :as routes]

@@ -1,4 +1,4 @@
 CREATE TABLE place (
   id VARCHAR(255) PRIMARY KEY,
-  menuFilePath VARCHAR(255)
+  filepath VARCHAR(255)
 );

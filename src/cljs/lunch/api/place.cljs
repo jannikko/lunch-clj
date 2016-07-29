@@ -3,13 +3,19 @@
                    [secretary.core :refer [defroute]])
   (:require [lunch.util :refer [GET]]
             [cljs-http.client :as http]
+            [lunch.api.handlers :refer [GET-handler]]
+            [re-frame.core :as re-frame :refer [dispatch]]
             [cljs.core.async :as async :refer [<! >! put! chan]]))
 
 (defn place [id] (str "api/place/" id))
 
 (defn get-one
-  [id]
-  (GET (place id)))
+  [db [_ handler]]
+  (GET (place (get-in db [:view :place-id]))))
+
+(re-frame/register-handler
+ :api-place/get-one
+ (GET-handler get-one))
 
 (defn upload
   [id file]

@@ -3,10 +3,14 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer :all]
+            [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
             [ring.middleware.reload :refer [wrap-reload]]))
 
 (defn place-download [id]
-  (res/response (str "You are viewing article: " id)))
+  (->
+   (res/response (str "You are viewing article: " id))
+   (res/header "csrf-token" *anti-forgery-token*)
+   (res/content-type "text/plain")))
 
 (defn place-upload [request]
   (println request)
@@ -15,7 +19,8 @@
 (defn api-routes [request]
   (routes
    (GET "/place/:id" [id] (place-download id))
-   (POST "/place/:id" request (place-upload request))
+   (GET "/place/:id/download" request (place-upload request))
+   (POST "/place/:id/upload" request (place-upload request))
    ))
 
 (defroutes app-routes
@@ -26,7 +31,7 @@
 
 (def handler (->
               app-routes
-              (wrap-defaults api-defaults)
+              (wrap-defaults site-defaults)
               ))
 
 (def dev-handler (-> handler wrap-reload))

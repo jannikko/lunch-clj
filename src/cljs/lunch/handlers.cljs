@@ -4,10 +4,11 @@
   (:require [re-frame.core :as re-frame :refer [dispatch]]
             [cljs.core.async :as async :refer [<! >! put! chan]]
             [clojure.string :as string]
-            [lunch.util :as util :refer [GET]]
             [lunch.routes :as routes]
             [lunch.api.place :as place-api]
             [lunch.db :as db]))
+
+
 
 
 (defn request-places-service
@@ -16,6 +17,7 @@
    (when (not (string/blank? query))
      (.textSearch service (clj->js {"query" query "location" location})
                   #(dispatch [:handle-places-search-result %])))))
+
 
 ;; Initialize the default db
 
@@ -93,15 +95,15 @@
 (re-frame/register-handler
  :initialize-detail-view
  (fn [db [_ params]]
-   (go
-     (let [result (<! (place-api/get-one (:id params)))]
-       (dispatch [:handle-place-response result])))
+   (dispatch [:api-place/get-one :handle-place-api-response])
    (assoc-in db [:view :place-id] (:id params))))
 
 
 (re-frame/register-handler
- :handle-place-response
+ :handle-place-api-response
  (fn [db [_ response]]
+   (println response)
+   (println db)
    db))
 
 (re-frame/register-handler
@@ -114,7 +116,7 @@
  :handle-file-loaded
  (fn [db [_ file-content]]
    (go
-     (let [result (place-api/post-one (-> db :view :place-id) file-content)]
+     (let [result (place-api/upload (-> db :view :place-id) file-content)]
        (dispatch [:handle-file-upload-response (<! result)])))
    db))
 
