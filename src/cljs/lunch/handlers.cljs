@@ -115,10 +115,7 @@
 (re-frame/register-handler
  :handle-file-loaded
  (fn [db [_ file-content]]
-   (go
-     (let [result (place-api/upload (-> db :view :place-id) file-content)]
-       (dispatch [:handle-file-upload-response (<! result)])))
-   db))
+   (dispatch [:api-place/upload-place :handle-file-upload-response file-content])))
 
 (re-frame/register-handler
  :handle-file-submit
