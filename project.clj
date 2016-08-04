@@ -67,6 +67,8 @@
 
   :main lunch.server
 
+  :uberjar-name "lunch.jar"
+
   :aot [lunch.server]
 
   :prep-tasks [["cljsbuild" "once" "min"] "compile"]
