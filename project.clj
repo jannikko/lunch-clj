@@ -58,8 +58,8 @@
      :jar true
      :compiler     {:main            lunch.core
                     :output-to       "resources/public/js/compiled/app.js"
-                    ;; Need externs for advanced compilation
-                    :optimizations   :advanced
+                    ;; advanced compilation not working yet 
+                    :optimizations   :whitespace
                     :closure-defines {goog.DEBUG false}
                     :pretty-print    false}}
 
