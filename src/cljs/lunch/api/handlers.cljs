@@ -4,20 +4,21 @@
             [cljs-http.client :as http]
             [cljs.core.async :as async :refer [<! >! put! chan]]))
 
+(def CSRF-HEADER "x-csrf-token")
 
 (defn extract-csrf
   [response]
-    (-> response :headers (get "csrf-token")))
+  (-> response :headers (get CSRF-HEADER)))
 
 (defn assoc-csrf
   [request csrf-token]
-  (assoc-in request [:args :headers "csrf-token"] csrf-token))
+  (assoc-in request [:params :headers CSRF-HEADER] csrf-token))
 
 (defn wrap-get-handler
   [handler]
   (fn [db [_ callback-handler & args]]
     (go
-      (let [request (handler db args)
+      (let [request (apply handler (conj args db))
             response (<! (http/get (:url request) (:params request)))]
           (dispatch [:api-handlers/handle-get-response response callback-handler])))
     db))

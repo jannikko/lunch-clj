@@ -10,11 +10,11 @@
 (defn place [id] (str "api/place/" id))
 
 (defn get-one
-  [db params]
+  [db]
   {:url (place (get-in db [:view :place-id]))})
 
 (defn upload-place
-  [db [file]]
+  [db file]
   {:url (str (place (get-in db [:view :place-id])) "/upload")
    :params {:multipart-params [["file" file]]}})
 

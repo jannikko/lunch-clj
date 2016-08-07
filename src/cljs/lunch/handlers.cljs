@@ -102,8 +102,7 @@
 (re-frame/register-handler
  :handle-place-api-response
  (fn [db [_ response]]
-   (println response)
-   (println db)
+   (.log js/console response)
    db))
 
 (re-frame/register-handler
@@ -115,7 +114,8 @@
 (re-frame/register-handler
  :handle-file-loaded
  (fn [db [_ file-content]]
-   (dispatch [:api-place/upload-place :handle-file-upload-response file-content])))
+   (dispatch [:api-place/upload-place :handle-file-upload-response file-content])
+  db))
 
 (re-frame/register-handler
  :handle-file-submit
