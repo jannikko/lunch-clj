@@ -1,8 +1,7 @@
 (ns lunch.api.place
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [secretary.core :refer [defroute]])
-  (:require [lunch.util :refer [GET]]
-            [cljs-http.client :as http]
+  (:require [cljs-http.client :as http]
             [lunch.api.handlers :refer [wrap-get-handler wrap-post-handler]]
             [re-frame.core :as re-frame :refer [dispatch]]
             [cljs.core.async :as async :refer [<! >! put! chan]]))
