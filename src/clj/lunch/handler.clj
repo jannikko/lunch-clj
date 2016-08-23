@@ -14,15 +14,13 @@
    (res/content-type "text/plain")))
 
 (defn place-upload [request]
-  (println request)
-  (res/response (str "You are viewing article: " request)))
+  (res/response (str "You are viewing: " (:body request))))
 
 (defn api-routes [request]
   (routes
    (GET "/place/:id" [id] (place-download id))
    (GET "/place/:id/download" request (place-upload request))
-   (POST "/place/:id/upload" request (place-upload request))
-   ))
+   (POST "/place/:id/upload" request (place-upload request))))
 
 (defroutes app-routes
   (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
@@ -30,8 +28,17 @@
   (route/resources "/")
   (route/not-found "Page not found"))
 
+(defn parse-body
+  [handler]
+  (fn [request]
+     (if (:body request)
+       (let [body (:body request)]
+       (handler (assoc request :body (slurp (.bytes body) :encoding "UTF-8"))))
+       (handler request))))
+
 (def handler (-> app-routes
-              (wrap-defaults site-defaults)))
+                 (parse-body)
+                 (wrap-defaults site-defaults)))
 
 (def dev-handler (-> handler wrap-reload))
 

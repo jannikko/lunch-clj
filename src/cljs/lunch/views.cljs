@@ -42,7 +42,6 @@
       [:div [:h1 "What would you like to eat today?"]
        [:div [:input {:type "text" :value @query :on-change #(dispatch [:search-input-changed (-> % .-target .-value)])}]
         [:button {:value "Location" :on-click #(dispatch [:location-request])} "My Location"]
-        [places-service-node]
         [search-results]]
        ])))
 
@@ -90,4 +89,6 @@
 (defn main-panel []
   (let [active-panel (re-frame/subscribe [:active-panel])]
     (fn []
-      [show-panel @active-panel])))
+      [:div
+       [places-service-node]
+       [show-panel @active-panel]])))
