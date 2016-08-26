@@ -3,7 +3,9 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer :all]
-            [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
+            [ring.middleware.anti-forgery :refer [*anti-forgery-token* wrap-anti-forgery]]
+            [ring.middleware.session :refer [wrap-session]]
+            [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.reload :refer [wrap-reload]]))
 
 (def CSRF-HEADER "x-csrf-token")
@@ -14,13 +16,20 @@
    (res/content-type "text/plain")))
 
 (defn place-upload [request]
-  (res/response (str "You are viewing: " (:body request))))
+  (res/response (str "You are viewing: " request)))
+
+;; TODO Implement saving files
+(defn save-place-upload-to-fs
+  [{:keys [filename content-type stream] :as args}]
+  "Filepath")
 
 (defn api-routes [request]
   (routes
    (GET "/place/:id" [id] (place-download id))
    (GET "/place/:id/download" request (place-upload request))
-   (POST "/place/:id/upload" request (place-upload request))))
+   (wrap-multipart-params
+    (POST "/place/:id/upload" {params :params} (place-upload params))
+    {:store save-place-upload-to-fs})))
 
 (defroutes app-routes
   (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
@@ -28,17 +37,10 @@
   (route/resources "/")
   (route/not-found "Page not found"))
 
-(defn parse-body
-  [handler]
-  (fn [request]
-     (if (:body request)
-       (let [body (:body request)]
-       (handler (assoc request :body (slurp (.bytes body) :encoding "UTF-8"))))
-       (handler request))))
-
 (def handler (-> app-routes
-                 (parse-body)
-                 (wrap-defaults site-defaults)))
+                 (wrap-anti-forgery)
+                 (wrap-params)
+                 (wrap-session)))
 
 (def dev-handler (-> handler wrap-reload))
 

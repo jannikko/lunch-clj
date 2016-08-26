@@ -59,10 +59,7 @@
     (fn []
       [:div (str "This is the Detail Page for: " @place-id)
        [:div [:a {:href "#/"} "go to Home Page"]]
-       [:input {:type "file" :id "file"}]
-       [:button
-        {:on-click #(dispatch [:handle-file-submit
-                               (-> "file" (js/document.getElementById) .-files (aget 0))])} "Submit"]])))
+       [:input {:type "file" :id "file" :on-change #(dispatch [:handle-file-submit (-> % .-target .-files)])}]])))
 
 (defn detail-panel-did-mount
   [this]

@@ -107,23 +107,14 @@
 
 (re-frame/register-handler
  :handle-file-upload-response
- (fn [db [_ status]]
-   (.log js/console status)
+ (fn [db [_ response]]
+   (.log js/console (:body response))
    db))
 
-(re-frame/register-handler
- :handle-file-loaded
- (fn [db [_ file-content]]
-   (dispatch [:api-place/upload-place :handle-file-upload-response file-content])
-  db))
 
 (re-frame/register-handler
  :handle-file-submit
- (fn [db [_ file]]
-   (if file
-     (let [reader (new js/FileReader)]
-       (.readAsBinaryString reader file)
-       (aset reader "onload" #(dispatch [:handle-file-loaded (.. % -target -result)]))
-       (aset reader "onerror" #(dispatch [:handle-file-error]))
-       ))
+ (fn [db [_ files]]
+     (when files
+       (dispatch [:api-place/upload-place :handle-file-upload-response (aget files 0)]))
    db))
