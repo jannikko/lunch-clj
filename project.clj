@@ -1,8 +1,9 @@
 (defproject lunch "0.1.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.8.51"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
+                 [org.clojure/clojurescript "1.9.227"]
                  [org.clojure/core.async "0.2.374"]
                  [org.clojure/java.jdbc "0.6.1"]
+                 [org.clojure/tools.logging "0.3.1"]
                  [reagent "0.5.1"]
                  [binaryage/devtools "0.6.1"]
                  [re-frame "0.7.0"]
@@ -12,15 +13,18 @@
                  [yogthos/config "0.8"]
                  [postgresql "9.3-1102.jdbc41"]
                  [ragtime "0.6.0"]
+                 [slingshot "0.12.2"]
                  [ring "1.4.0"]
-                 [ring/ring-defaults "0.2.1"]
-                 ]
+                 [ring/ring-mock "0.3.0"]
+                 [ring/ring-defaults "0.2.1"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [cider/cider-nrepl "0.12.0"]
             [lein-less "1.7.5"]]
 
   :min-lein-version "2.5.3"
+
+  :test-paths ["test"]
 
   :aliases {"migrate"  ["run" "-m" "user/migrate"]
             "rollback" ["run" "-m" "user/rollback"]}

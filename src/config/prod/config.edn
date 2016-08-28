@@ -1,1 +1,4 @@
-{:database-url "postgresql://lunch:lunch@localhost/lunch"}
+{:port "80"
+ :db-uri "postgresql://lunch:lunch@localhost/lunch"
+ :file-storage {:type "remote" :url "example.com"}
+ }

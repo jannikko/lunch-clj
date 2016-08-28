@@ -6,8 +6,5 @@
 (defn generate-file-path [id]
   (str file-storage-path id))
 
-(defn save-file [file file-id]
-  (let [file-path (generate-file-path file-id)
-        tempfile (:tempfile file)]
-    (io/copy tempfile (io/file (generate-file-path file-id))))
-  file-path)
+(defn save-file [temp-file file-id]
+    (io/copy temp-file (io/file (generate-file-path file-id))))

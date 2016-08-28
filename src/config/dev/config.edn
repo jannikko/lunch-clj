@@ -1,2 +1,4 @@
 {:port "3500"
- :db-uri "postgresql://lunch:lunch@localhost/lunch"}
+ :db-uri "postgresql://lunch:lunch@localhost/lunch"
+ :file-storage {:type "local" :path "/var/lib/lunch"}
+ }
