@@ -1,4 +1,7 @@
 {:port "3500"
- :db-uri "postgresql://lunch:lunch@localhost/lunch"
+ :db-spec {:classname "org.postgresql.Driver"
+              :subprotocol "postgresql"
+              :subname "//localhost:5432/lunch"
+              :user "lunch"}
  :file-storage {:type "local" :path "/var/lib/lunch"}
  }

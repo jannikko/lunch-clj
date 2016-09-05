@@ -1,12 +1,6 @@
 (ns lunch.handler
-  (:import java.io.IOException)
-  (:require [clojure.string :refer [blank?]]
-            ;;[clojure.tools.logging :as log]
-            [clojure.spec :as s]
+  (:require [lunch.routes.menu :as menu-routes]
             [ring.util.response :as res :refer [resource-response content-type]]
-            [lunch.file-util :as futil]
-            [lunch.exceptions :refer :all]
-            [slingshot.slingshot :refer [throw+]]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.anti-forgery :refer [*anti-forgery-token* wrap-anti-forgery]]
@@ -16,50 +10,26 @@
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.reload :refer [wrap-reload]]))
 
-
 (def CSRF-HEADER "x-csrf-token")
 
-(defn place-download [id]
-  (-> (res/response (str "You are viewing article: " id))
-      (res/header CSRF-HEADER *anti-forgery-token*)
-      (res/content-type "text/plain")))
-
-
-(s/def ::id (s/and string? (complement blank?)))
-(s/def ::tempfile (s/and string? (complement blank?)))
-(s/def ::file (s/keys :req-un [::tempfile]))
-(s/def ::file-upload-params (s/keys :req-un [::id ::file]))
-
-(defn place-upload [params]
-  (if (s/valid? ::file-upload-params params)
-    (let [file (:file params) place-id (:id params)]
-      (do
-        (try
-          (let [filepath (futil/save-file (:tempfile file) place-id)]
-            (catch IOException e (do (print (str "Error writing file " file (.getMessage e)))
-                                     (throw+ (ApplicationException 400 "File could not be uploaded, please try again"))))))
-        (res/response (str "You are viewing: " params))))
-    (do 
-      ;; Need to set up log4j
-      (print (s/explain ::file-upload-params params))
-      (throw+ (ApplicationException 400 "Something went wrong when uploading the file")))))
-
-
-(defn api-routes [request]
-  (routes
-    (GET "/place/:id" [id] (place-download id))
-    (GET "/place/:id/download" request (place-upload request))
-      (POST "/place/:id/upload" {params :params} (place-upload params))))
-
+(defn add-csrf-token 
+  "Adds CSRF Token to the response header of get requests"
+  [app]
+  (fn [request] 
+    (let [response (app request)]
+      (if (= (:request-method request) :get)
+        (res/header response CSRF-HEADER *anti-forgery-token*)  
+        response))))
 
 (defroutes app-routes
   (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
-  (context "/api" [request] (api-routes request))
+  (context "/api" [] 
+           (context "/place" [request] (menu-routes/handler request)))
   (route/resources "/")
   (route/not-found "Page not found"))
 
-
 (def handler (-> app-routes
+                 (add-csrf-token)
                  (wrap-anti-forgery)
                  (wrap-keyword-params)
                  (wrap-multipart-params)
