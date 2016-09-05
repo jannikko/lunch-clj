@@ -1,4 +1,0 @@
-CREATE TABLE place (
-  id VARCHAR(255) PRIMARY KEY,
-  filepath VARCHAR(255)
-);
