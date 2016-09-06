@@ -11,6 +11,7 @@
                  [re-frame "0.7.0"]
                  [secretary "1.2.3"]
                  [compojure "1.5.0"]
+                 [clojurewerkz/route-one "1.2.0"]
                  [cljs-http "0.1.41"]
                  [yogthos/config "0.8"]
                  [postgresql "9.3-1102.jdbc41"]

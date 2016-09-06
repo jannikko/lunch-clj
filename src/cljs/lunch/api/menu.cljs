@@ -1,4 +1,4 @@
-(ns lunch.api.place
+(ns lunch.api.menu
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [secretary.core :refer [defroute]])
   (:require [cljs-http.client :as http]
@@ -6,21 +6,21 @@
             [re-frame.core :as re-frame :refer [dispatch]]
             [cljs.core.async :as async :refer [<! >! put! chan]]))
 
-(defn place [id] (str "api/place/" id))
+(defn menu [id] (str "api/menu/" id))
 
 (defn get-one
   [db]
-  {:url (place (get-in db [:view :place-id]))})
+  {:url (menu (get-in db [:view :place-id]))})
 
-(defn upload-place
+(defn upload-menu
   [db file]
-  {:url (str (place (get-in db [:view :place-id])) "/upload")
+  {:url (str (menu (get-in db [:view :place-id])) "/upload")
    :params {:multipart-params [["file" file]]}})
 
 (re-frame/register-handler
- :api-place/get-one
+ :api-menu/get-one
  (wrap-get-handler get-one))
 
 (re-frame/register-handler
- :api-place/upload-place
- (wrap-post-handler upload-place))
+ :api-menu/upload-menu
+ (wrap-post-handler upload-menu))

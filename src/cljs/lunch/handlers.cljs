@@ -5,7 +5,7 @@
             [cljs.core.async :as async :refer [<! >! put! chan]]
             [clojure.string :as string]
             [lunch.routes :as routes]
-            [lunch.api.place :as place-api]
+            [lunch.api.menu :as menu-api]
             [lunch.db :as db]))
 
 
@@ -95,12 +95,12 @@
 (re-frame/register-handler
  :initialize-detail-view
  (fn [db [_ params]]
-   (dispatch [:api-place/get-one :handle-place-api-response])
+   (dispatch [:api-menu/get-one :handle-menu-api-response])
    (assoc-in db [:view :place-id] (:id params))))
 
 
 (re-frame/register-handler
- :handle-place-api-response
+ :handle-menu-api-response
  (fn [db [_ response]]
    (.log js/console response)
    db))
@@ -116,5 +116,5 @@
  :handle-file-submit
  (fn [db [_ files]]
      (when files
-       (dispatch [:api-place/upload-place :handle-file-upload-response (aget files 0)]))
+       (dispatch [:api-menu/upload-menu :handle-file-upload-response (aget files 0)]))
    db))

@@ -2,7 +2,7 @@
 -- Create the place table
 CREATE TABLE menu (
   id VARCHAR(255) PRIMARY KEY,
-  filepath VARCHAR(255)
+  filepath VARCHAR(255) NOT NULL
 );
 
 -- name: insert!

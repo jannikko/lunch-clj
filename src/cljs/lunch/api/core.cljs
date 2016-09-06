@@ -1,2 +1,2 @@
 (ns lunch.api
-  (:require [lunch.api.place]))
+  (:require [lunch.api.menu]))
