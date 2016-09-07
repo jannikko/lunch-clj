@@ -12,3 +12,7 @@ INSERT INTO menu (id, filepath) VALUES (:id, :filepath);
 -- name: find-by-id
 -- Selects the filepath to a menu by id
 SELECT filepath FROM menu WHERE id = :id;
+
+-- name: remove-by-id!
+-- Selects the filepath to a menu by id
+DELETE FROM menu WHERE id = :id;
