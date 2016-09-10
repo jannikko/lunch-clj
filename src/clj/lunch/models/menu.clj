@@ -1,20 +1,30 @@
 (ns lunch.models.menu
   (:require [yesql.core :refer [defqueries]]
             [lunch.file-util :as futil]
-            [clojure.java.jdbc :as jdbc]
-            [config.core :refer [env]]))
+            [lunch.models.db :as db]
+            [clojure.java.jdbc :as jdbc]))
 
-(def db-spec (:db-spec env))
+(def connection-map {:connection {:datasource db/datasource}})
 
-(defqueries "lunch/models/sql/menu.sql"
-   {:connection db-spec})
+(defqueries "lunch/models/sql/menu.sql" connection-map)
 
-(defn exists? [id]
-  (let [menu (find-by-id {:id id})]
+(defn exists? [id conn]
+  (let [menu (find-by-id {:id id} conn)]
          (not (empty? menu))))
 
-(defn insert-file [file place-id]
+
+(defn insert-file
+  "Saves a file if it does not exist yet"
+  ([file place-id] (insert-file file place-id connection-map))
+  ([file place-id conn]
   (let [filepath (futil/generate-file-path place-id)]
-    (jdbc/with-db-transaction [conn db-spec]
-      (insert! {:id place-id :filepath filepath} {:connection conn})
-      (futil/save-file (:tempfile file) filepath))))
+    (if (exists? place-id conn)
+      false
+      (do (insert! {:id place-id :filepath filepath} conn)
+          (futil/save-file (:tempfile file) filepath)
+          true)))))
+
+(defn insert-file-transactional
+  "Saves a file transactional if it does not exist yet"
+  [file place-id]
+  (db/with-transaction (partial insert-file file place-id)))

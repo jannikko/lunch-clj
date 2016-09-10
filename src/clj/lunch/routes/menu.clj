@@ -5,7 +5,7 @@
             [clojure.spec :as s]
             [lunch.models.menu :as menu-model]
             [clojure.tools.logging :as log]
-            [ring.util.response :as res]
+            [ring.util.http-response :as res]
             [lunch.file-util :as futil]
             [lunch.exceptions :refer :all]
             [slingshot.slingshot :refer [throw+]]
@@ -40,10 +40,9 @@
   (if (s/valid? ::file-upload-params params)
     (let [file (:file params) place-id (:id params)]
       (try 
-        (if (menu-model/exists? place-id)
-          (res/response {:menu place-id})
-          (do (menu-model/insert-file file place-id)
-              (res/created place-id)))
+        (if (menu-model/insert-file-transactional file place-id) 
+          (res/created place-id)
+          (res/conflict))
         (catch IOException e (do (log/warn (join " " ["Error writing file" file (.getMessage e)]))
                                  (throw+ file-upload-error)))
         (catch SQLException e (do (log/warn (join " " ["Error inserting entry into the databasee" file (.getMessage e)]))

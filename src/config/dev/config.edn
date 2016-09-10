@@ -1,7 +1,9 @@
 {:port "3500"
- :db-spec {:classname "org.postgresql.Driver"
-              :subprotocol "postgresql"
-              :subname "//localhost:5432/lunch"
-              :user "lunch"}
+ :db-spec {:maximum-pool-size  3
+           :adapter            "postgresql"
+           :username           "lunch"
+           :database-name      "lunch"
+           :server-name        "localhost"
+           :port-number        5432}
  :file-storage {:type "local" :path "/var/lib/lunch"}
  }

@@ -18,6 +18,8 @@
                     :headers {"Content-Length"  "2089",  "Last-Modified"  "Mon, 05 Sep 2016 16:19:16 GMT"} 
                     :body test-file})
 
+(def valid-file-upload {:id "123" :file {:tempfile test-file}})
+
 (deftest menu-routes
   (testing "menu-routes"
     (testing "menu-upload"
@@ -26,17 +28,16 @@
       (is (thrown+? application-exception? (menu-upload {:id 123 :file {:tempfile test-file}})))
       (is (thrown+? application-exception? (menu-upload {:id nil :file {:tempfile test-file}})))
       (is (thrown+? application-exception? (menu-upload {:id "123" :file {:tempfile nil}})))
-      ;; Mock save-file function to return a path
-      (with-redefs-fn {#'lunch.file-util/save-file (fn [t1 t2] (str "/bin/lib/123.pdf"))
-                       #'lunch.models.menu/exists? (fn [id] false)
-                       #'lunch.models.menu/insert! (fn [params conn] ())}
-        #(is (response? 201 (menu-upload {:id "123" :file {:tempfile test-file}}))))
-      ;; Mock save-file function to throw an error 
-      (with-redefs-fn {#'lunch.file-util/save-file (fn [t1 t2] (throw (IOException. "Fails")))
-                       #'lunch.models.menu/exists? (fn [id] false)
-                       #'lunch.models.menu/insert! (fn [params conn] ())}
-        #(is (thrown+? application-exception? (menu-upload {:id "123" :file {:tempfile test-file}})))))
-
+      ;; File does not exist yet
+      (with-redefs-fn {#'lunch.models.menu/insert-file (constantly true)}
+        #(is (response? 201 (menu-upload valid-file-upload))))
+      ;; File does already exist
+      (with-redefs-fn {#'lunch.models.menu/insert-file (constantly false)}
+        #(is (response? 409 (menu-upload valid-file-upload))))
+      ;; Error while trying to insert the file 
+      (with-redefs-fn {#'lunch.models.menu/insert-file (fn [t1 t2 t3] (throw (IOException. "Fails")))}
+        #(is (thrown+? application-exception? (menu-upload {:id "123" :file {:tempfile test-file}}))))
+      )
     (testing "menu-upload"
       (is (thrown+? application-exception? (menu-download nil)))
       ;; Returns empty when not found in db

@@ -3,6 +3,7 @@
                  [org.clojure/clojurescript "1.9.227"]
                  [org.clojure/core.async "0.2.374"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
+                 [hikari-cp "1.7.3"]
                  [org.clojure/tools.logging  "0.3.1"]
                  [org.slf4j/slf4j-api "1.6.4"]
                  [ch.qos.logback/logback-classic "1.0.1"]
@@ -19,6 +20,7 @@
                  [slingshot "0.12.2"]
                  [yesql "0.5.3"]
                  [ring "1.4.0"]
+                 [metosin/ring-http-response "0.8.0"]
                  [ring/ring-mock "0.3.0"]
                  [ring/ring-defaults "0.2.1"]]
 
