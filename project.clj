@@ -20,6 +20,7 @@
                  [slingshot "0.12.2"]
                  [yesql "0.5.3"]
                  [ring "1.4.0"]
+                 [com.stuartsierra/component "0.3.1"]
                  [metosin/ring-http-response "0.8.0"]
                  [ring/ring-mock "0.3.0"]
                  [ring/ring-defaults "0.2.1"]]
@@ -40,24 +41,20 @@
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
-  :figwheel {:css-dirs ["resources/public/css"]
-             :ring-handler lunch.handler/dev-handler}
+  :figwheel {:css-dirs ["resources/public/css"]}
 
   :less {:source-paths ["less"]
          :target-path  "resources/public/css"}
 
   :profiles
   {:dev
-   {:dependencies [[com.cemerick/piggieback  "0.2.1"]
-                   [figwheel-sidecar "0.5.2"]]
+   {:dependencies []
     :resource-paths ["src/config/dev"]
     :plugins      [[lein-figwheel "0.5.4-3"]]
     :main user
     }
    :client {:prep-tasks [["cljsbuild" "once" "min"] "compile"]}
    }
-
-  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
   :cljsbuild
   {:builds
@@ -82,10 +79,7 @@
 
     ]}
 
-  :main lunch.server
+  :main lunch.system
 
   :uberjar-name "lunch.jar"
-
-  :aot [lunch.server]
-
   )

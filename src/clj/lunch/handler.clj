@@ -10,12 +10,9 @@
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.reload :refer [wrap-reload]]))
 
-;; Write more tests for file upload
 ;; Write general tests that use ring/mock for handler
 ;; Respond with json
-;; Refactor place to lunch
 ;; Use clojurewerkz/route-one for bidirectional routing
-;; Or look into using compojure api
 
 (def CSRF-HEADER "x-csrf-token")
 
@@ -28,21 +25,21 @@
         (res/header response CSRF-HEADER *anti-forgery-token*)  
         response))))
 
-(defroutes app-routes
-  (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
-  (context "/api" [] 
-           (context "/menu" [request] (menu-routes/handler request)))
-  (route/resources "/")
-  (route/not-found "Page not found"))
+(defn app-routes
+  [db]
+  (routes 
+    (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
+    (context "/api" [] 
+             (context "/menu" [request] (menu-routes/handler request db)))
+    (route/resources "/")
+    (route/not-found "Page not found")))
 
-(def handler (-> app-routes
-                 (add-csrf-token)
-                 (wrap-anti-forgery)
-                 (wrap-keyword-params)
-                 (wrap-multipart-params)
-                 (wrap-params)
-                 (wrap-session)))
-
-(def dev-handler (-> handler wrap-reload))
-
-
+(defn handler 
+  [db] 
+  (-> (app-routes db)
+      (add-csrf-token)
+      (wrap-anti-forgery)
+      (wrap-keyword-params)
+      (wrap-multipart-params)
+      (wrap-params)
+      (wrap-session)))

@@ -1,22 +1,24 @@
 (ns user
-  (:require [ragtime.jdbc :as jdbc]
-            [figwheel-sidecar.repl-api :as ra]
-            [config.core :refer [env]]
-	    [ragtime.repl :as repl]))
+  (:require [com.stuartsierra.component :as component]
+            [clojure.tools.namespace.repl :refer [refresh]]
+            [lunch.system :as app]))
 
-(defn load-config []
-  ;; Move this to config file
-  {:datastore  (jdbc/sql-database (:db-uri env))
-   :migrations (jdbc/load-resources "migrations")})
+(def system nil)
 
-(defn migrate []
-  (repl/migrate (load-config)))
+(defn init []
+  (alter-var-root #'system
+    (constantly app/system)))
 
-(defn rollback []
-  (repl/rollback (load-config)))
+(defn start []
+  (alter-var-root #'system component/start))
 
-(defn start  []  (ra/start-figwheel!))
+(defn stop []
+  (alter-var-root #'system
+    (fn [s] (when s (component/stop s)))))
 
-(defn stop  []  (ra/stop-figwheel!))
+(defn go []
+  (init)
+  (start))
 
-(defn cljs  []  (ra/cljs-repl "dev"))
+(defn reset []
+  (stop))

@@ -1,10 +1,18 @@
 (ns lunch.server
-  (:require [lunch.handler :refer [dev-handler]]
+  (:require [lunch.handler :refer [handler]]
             [clojure.tools.logging :as log]
-            [config.core :refer [env]]
-            [ring.adapter.jetty :refer [run-jetty]])
-  (:gen-class))
+            [com.stuartsierra.component :as component]
+            [ring.adapter.jetty :refer [run-jetty]]))
 
-(defn -main [& args]
-  (let [port (Integer/parseInt (or (env :port) "3000"))]
-    (run-jetty dev-handler {:port port :join? false})))
+(defrecord Server [port database server]
+  component/Lifecycle
+  (start [component]
+    (let [server (run-jetty (handler database) {:port port :join? false})]
+      (assoc component :server server)))
+  (stop [component]
+    (.stop server)
+    (assoc component :server nil)))
+
+(defn new-server
+  [config]
+  (map->Server {:port (:port config)}))
