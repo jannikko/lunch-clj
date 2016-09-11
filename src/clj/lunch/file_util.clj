@@ -1,5 +1,4 @@
 (ns lunch.file-util 
-  (:import (java.io File))
   (:require [clojure.java.io :as io]))
 
 ;; TODO move to config 

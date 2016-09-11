@@ -1,8 +1,7 @@
 (ns lunch.models.menu
   (:require [yesql.core :refer [defqueries]]
             [lunch.file-util :as futil]
-            [lunch.db :as db]
-            [clojure.java.jdbc :as jdbc]))
+            [lunch.db :as db]))
 
 (defqueries "lunch/models/sql/menu.sql")
 
@@ -22,5 +21,5 @@
 
 (defn insert-file-transactional
   "Saves a file transactional if it does not exist yet"
-  [file place-id db]
-  (db/with-transaction (partial insert-file file place-id) db))
+  [file place-id connection]
+  (db/with-transaction (partial insert-file file place-id) connection))

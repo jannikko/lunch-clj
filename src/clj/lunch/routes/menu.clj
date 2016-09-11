@@ -6,11 +6,9 @@
             [clojure.tools.logging :as log]
             [ring.util.http-response :as res]
             [lunch.models.menu :as menu-model]
-            [lunch.file-util :as futil]
             [lunch.exceptions :refer :all]
-            [lunch.db :refer [get-conn]]
+            [lunch.db :refer [get-connection]]
             [slingshot.slingshot :refer [throw+]]
-            [ring.middleware.anti-forgery :refer [*anti-forgery-token* wrap-anti-forgery]]
             [compojure.core :refer :all]))
 
 (def file-upload-error (ApplicationException 400 "File could not be uploaded, please try again"))
@@ -29,7 +27,7 @@
   (when (not (s/valid? ::id id))
     (log/warn (join " " [(s/explain ::id id) (str "Validation failed trying download file")]))
     (throw+ (ApplicationException 400 "Something went wrong when downloading the file")))
-  (let [query-result (menu-model/find-by-id {:id id} (get-conn db))]
+  (let [query-result (menu-model/find-by-id {:id id} (get-connection db))]
     (if (empty? query-result)
       (res/not-found)
       (let [filepath (:filepath query-result)]
@@ -44,7 +42,7 @@
   (if (s/valid? ::file-upload-params params)
     (let [file (:file params) place-id (:id params)]
       (try 
-        (if (menu-model/insert-file-transactional file place-id db) 
+        (if (menu-model/insert-file-transactional file place-id (get-connection db)) 
           (res/created place-id)
           (res/conflict))
         (catch IOException e (do (log/warn (join " " ["Error writing file" file (.getMessage e)]))
@@ -54,7 +52,7 @@
 
 
 (defn handler
-  [request db]
+  [db]
   (routes
     (GET "/:id" [request] (menu-get request))
     (GET "/:id/download" [id] (menu-download id db))

@@ -30,7 +30,7 @@
   (routes 
     (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
     (context "/api" [] 
-             (context "/menu" [request] (menu-routes/handler request db)))
+             (context "/menu" [] (menu-routes/handler db)))
     (route/resources "/")
     (route/not-found "Page not found")))
 

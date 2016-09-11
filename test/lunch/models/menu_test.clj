@@ -1,5 +1,6 @@
 (ns lunch.models.menu-test
-  (:import (java.io IOException File))
+  (:import [java.io File]
+           [java.sql Connection])
   (:require [lunch.routes.menu :refer :all]
             [lunch.models.menu :as menu-model]
             [ring.mock.request :as mock]
@@ -12,9 +13,7 @@
 (def mock-insert! (fn [object conn] (swap! mock-db conj object)))
 (def mock-save-file (fn [file filepath] ()))
 
-(defn response? [code res]
-  (= (:status res) code))
-
+(def connection {:connection (reify Connection)})
 (def test-file (File. "/tmp"))
 
 (def valid-file {:tempfile test-file})
@@ -27,9 +26,9 @@
                        #'lunch.file-util/save-file mock-save-file}
       #(do
          (reset! mock-db [])
-         (is (= true (menu-model/insert-file valid-file "12345")))
-         (is (= false (menu-model/insert-file valid-file "12345")))
-         (is (= true (menu-model/insert-file valid-file "54321")))
+         (is (= true (menu-model/insert-file valid-file "12345" connection)))
+         (is (= false (menu-model/insert-file valid-file "12345" connection)))
+         (is (= true (menu-model/insert-file valid-file "54321" connection)))
         )))))
 
 
