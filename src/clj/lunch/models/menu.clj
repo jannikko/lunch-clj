@@ -14,8 +14,7 @@
   "Saves a file if it does not exist yet"
   ([file place-id conn]
    {:pre  [(s/valid? :lunch.routes.menu/file file)
-           (s/valid? :lunch.routes.menu/id place-id)
-           (s/valid? ::db/valid-connection conn)]
+           (s/valid? :lunch.routes.menu/id place-id)]
     :post [(s/valid? boolean? %)]}
    (let [filepath (futil/generate-file-path place-id)]
      (if (exists? place-id conn)

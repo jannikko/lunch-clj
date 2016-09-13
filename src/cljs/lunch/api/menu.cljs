@@ -10,7 +10,7 @@
 
 (defn get-one
   [db]
-  {:url (menu (get-in db [:view :place-id]))})
+  {:url (str (menu (get-in db [:view :place-id])) "/download")})
 
 (defn upload-menu
   [db file]

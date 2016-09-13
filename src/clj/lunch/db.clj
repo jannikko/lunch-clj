@@ -22,15 +22,10 @@
   [config]
   (map->Database {:spec (:spec config)}))
 
-(defn get-datasource
-  "Returns a jdbc datasource object"
-  [db]
-  {:datasource (:datasource db)})
-
 (defn get-connection
   "Returns a jdbc connection object"
   [db]
-  {:connection (-> db get-datasource jdbc/get-connection)})
+  {:connection (jdbc/get-connection {:connection {:datasource (:datasource db)}})})
 
 (defn with-transaction
   "Executes the provided function in a transactional context"
