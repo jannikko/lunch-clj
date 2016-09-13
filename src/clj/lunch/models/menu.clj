@@ -1,6 +1,7 @@
 (ns lunch.models.menu
   (:require [yesql.core :refer [defqueries]]
             [lunch.file-util :as futil]
+            [clojure.spec :as s]
             [lunch.db :as db]))
 
 (defqueries "lunch/models/sql/menu.sql")
@@ -12,12 +13,16 @@
 (defn insert-file
   "Saves a file if it does not exist yet"
   ([file place-id conn]
-  (let [filepath (futil/generate-file-path place-id)]
-    (if (exists? place-id conn)
-      false
-      (do (insert! {:id place-id :filepath filepath} conn)
-          (futil/save-file (:tempfile file) filepath)
-          true)))))
+   {:pre  [(s/valid? :lunch.routes.menu/file file)
+           (s/valid? :lunch.routes.menu/id place-id)
+           (s/valid? ::db/valid-connection conn)]
+    :post [(s/valid? boolean? %)]}
+   (let [filepath (futil/generate-file-path place-id)]
+     (if (exists? place-id conn)
+       false
+       (do (insert! {:id place-id :filepath filepath} conn)
+           (futil/save-file (:tempfile file) filepath)
+           true)))))
 
 (defn insert-file-transactional
   "Saves a file transactional if it does not exist yet"

@@ -1,9 +1,9 @@
 (ns lunch.exceptions)
 
-(def application-exception-key ::application-exception)
+(def application-exception-type ::application-exception)
 
 (defn application-exception? [ex]
-  (= (:type ex) application-exception-key))
+  (= (:type ex) application-exception-type))
 
 (defn ApplicationException [code message]
-  {:type application-exception-key :code code :message message})
+  {:type application-exception-type :code code :message message})

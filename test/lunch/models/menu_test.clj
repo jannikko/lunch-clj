@@ -13,10 +13,11 @@
 (def mock-insert! (fn [object conn] (swap! mock-db conj object)))
 (def mock-save-file (fn [file filepath] ()))
 
-(def connection {:connection (reify Connection)})
+(def connection {:connection (proxy [Connection] [] (constantly nil))})
 (def test-file (File. "/tmp"))
 
 (def valid-file {:tempfile test-file})
+(def invalid-file {})
 
 (deftest menu-routes
   (testing "menu-model"
@@ -24,12 +25,16 @@
       (with-redefs-fn {#'lunch.models.menu/exists? mock-exists
                        #'lunch.models.menu/insert! mock-insert!
                        #'lunch.file-util/save-file mock-save-file}
-      #(do
-         (reset! mock-db [])
-         (is (= true (menu-model/insert-file valid-file "12345" connection)))
-         (is (= false (menu-model/insert-file valid-file "12345" connection)))
-         (is (= true (menu-model/insert-file valid-file "54321" connection)))
-        )))))
+        #(do
+          (reset! mock-db [])
+          (is (= true (menu-model/insert-file valid-file "12345" connection)))
+          ;; Does not create the resource again if the id is the same
+          (is (= false (menu-model/insert-file valid-file "12345" connection)))
+          (is (= true (menu-model/insert-file valid-file "54321" connection)))
+          (is (thrown? AssertionError (menu-model/insert-file invalid-file "54321" connection)))
+          (is (thrown? AssertionError (menu-model/insert-file invalid-file nil connection)))
+          (is (thrown? AssertionError (menu-model/insert-file invalid-file nil "not a connection")))
+          )))))
 
 
 

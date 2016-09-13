@@ -11,7 +11,7 @@
             [slingshot.slingshot :refer [throw+]]
             [compojure.core :refer :all]))
 
-(def file-upload-error (ApplicationException 400 "File could not be uploaded, please try again"))
+(def file-upload-error (ApplicationException 500 "File could not be uploaded, please try again"))
 
 (s/def ::id (s/and string? (complement blank?)))
 (s/def ::tempfile #(instance? File %))
@@ -23,10 +23,8 @@
 
 (defn menu-download
   "Handler for menu downloads, retrieves the filepath from the db and sends the file back"
-  [id db] 
-  (when (not (s/valid? ::id id))
-    (log/warn (join " " [(s/explain ::id id) (str "Validation failed trying download file")]))
-    (throw+ (ApplicationException 400 "Something went wrong when downloading the file")))
+  [id db]
+  {:pre [(s/valid? ::id id)]}
   (let [query-result (menu-model/find-by-id {:id id} (get-connection db))]
     (if (empty? query-result)
       (res/not-found)
@@ -36,19 +34,16 @@
 (defn menu-upload 
   "Handler for menu uploads, saves the file if it does not already exist"
   [params db]
-  (when (not (s/valid? ::file-upload-params params))
-    (log/warn (join " " [(s/explain ::file-upload-params params) "Validation failed trying to upload file" params]))
-    (throw+ (ApplicationException 400 "Something went wrong when uploading the file")))
-  (if (s/valid? ::file-upload-params params)
-    (let [file (:file params) place-id (:id params)]
-      (try 
-        (if (menu-model/insert-file-transactional file place-id (get-connection db)) 
-          (res/created place-id)
-          (res/conflict))
-        (catch IOException e (do (log/warn (join " " ["Error writing file" file (.getMessage e)]))
-                                 (throw+ file-upload-error)))
-        (catch SQLException e (do (log/warn (join " " ["Error inserting entry into the databasee" file (.getMessage e)]))
-                                  (throw+ file-upload-error)))))))
+  {:pre [(s/valid? ::file-upload-params params)]}
+  (let [file (:file params) place-id (:id params)]
+    (try
+      (if (menu-model/insert-file-transactional file place-id (get-connection db))
+        (res/created place-id)
+        (res/conflict))
+      (catch IOException e (do (log/warn (join " " ["Error writing file" file (.getMessage e)]))
+                               (throw+ file-upload-error)))
+      (catch SQLException e (do (log/warn (join " " ["Error inserting entry into the databasee" file (.getMessage e)]))
+                                (throw+ file-upload-error))))))
 
 
 (defn handler

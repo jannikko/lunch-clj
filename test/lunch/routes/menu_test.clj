@@ -30,10 +30,10 @@
   (testing "menu-routes"
     (testing "menu-upload"
       ;; Test input validation
-      (is (thrown+? application-exception? (menu-upload nil db)))
-      (is (thrown+? application-exception? (menu-upload {:id 123 :file {:tempfile test-file}} db)))
-      (is (thrown+? application-exception? (menu-upload {:id nil :file {:tempfile test-file}} db)))
-      (is (thrown+? application-exception? (menu-upload {:id "123" :file {:tempfile nil}} db)))
+      (is (thrown? AssertionError (menu-upload nil db)))
+      (is (thrown? AssertionError (menu-upload {:id 123 :file {:tempfile test-file}} db)))
+      (is (thrown? AssertionError (menu-upload {:id nil :file {:tempfile test-file}} db)))
+      (is (thrown? AssertionError (menu-upload {:id "123" :file {:tempfile nil}} db)))
       ;; File does not exist yet
       (with-redefs-fn {#'lunch.models.menu/insert-file-transactional (constantly true)
                        #'lunch.db/get-connection                     (constantly connection)}
@@ -47,7 +47,7 @@
                        #'lunch.db/get-connection                     (constantly connection)}
         #(is (thrown+? application-exception? (menu-upload {:id "123" :file {:tempfile test-file}} db)))) )
     (testing "menu-download"
-      (is (thrown+? application-exception? (menu-download nil db)))
+      (is (thrown? AssertionError (menu-download nil db)))
       ;; Returns empty when not found in db
       (with-redefs-fn {#'lunch.models.menu/find-by-id (fn [id conn] ())
                        #'lunch.db/get-connection      (constantly connection)}

@@ -4,5 +4,8 @@
 /resources/public/js/compiled
 out
 .lein-repl-history
+.lein-failures
 .DS_STORE
 *.#
+/.cljs_rhino_repl
+/.idea

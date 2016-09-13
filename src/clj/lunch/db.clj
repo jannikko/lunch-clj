@@ -1,9 +1,13 @@
 (ns lunch.db
+  (:import [java.sql Connection])
   (:require [hikari-cp.core :refer :all]
             [config.core :refer [env]]
             [clojure.spec :as s]
             [com.stuartsierra.component :as component]
             [clojure.java.jdbc :as jdbc]))
+
+(s/def ::connection #(instance? Connection %))
+(s/def ::valid-connection (s/keys :req-un [::connection]))
 
 (defrecord Database [spec datasource]
   component/Lifecycle
@@ -28,9 +32,9 @@
   [db]
   {:connection (-> db get-datasource jdbc/get-connection)})
 
-(defn with-transaction 
+(defn with-transaction
   "Executes the provided function in a transactional context"
-  [func conn] 
+  [func conn]
   (jdbc/with-db-transaction [trans-conn conn]
-    (func {:connection trans-conn})))
+                            (func {:connection trans-conn})))
 
