@@ -2,8 +2,7 @@
   (:require [config.core :refer [env]]
             [lunch.db :refer [new-database]]
             [lunch.server :refer [new-server]]
-            [com.stuartsierra.component :as component]
-            [clojure.java.jdbc :as jdbc]))
+            [com.stuartsierra.component :as component]))
 
 (defn system-config
   [config]

@@ -3,37 +3,32 @@
            [java.sql Connection])
   (:require [lunch.routes.menu :refer :all]
             [lunch.models.menu :as menu-model]
-            [ring.mock.request :as mock]
-            [lunch.file-util :as futil]
             [clojure.test :refer :all]))
 
 ;; Mock SQL with in-memory store
 (def mock-db (atom []))
 (def mock-exists (fn [id conn] (->> @mock-db (filter #(= (:id %) id)) empty? not)))
 (def mock-insert! (fn [object conn] (swap! mock-db conj object)))
-(def mock-save-file (fn [file filepath] ()))
 
 (def connection {:connection (proxy [Connection] [] (constantly nil))})
-(def test-file (File. "/tmp"))
 
-(def valid-file {:tempfile test-file})
+(def valid-link "www.example.com")
 (def invalid-file {})
 
 (deftest menu-routes
   (testing "menu-model"
     (testing "insert-file"
       (with-redefs-fn {#'lunch.models.menu/exists? mock-exists
-                       #'lunch.models.menu/insert! mock-insert!
-                       #'lunch.file-util/save-file mock-save-file}
+                       #'lunch.models.menu/insert! mock-insert!}
         #(do
           (reset! mock-db [])
-          (is (= true (menu-model/insert-file valid-file "12345" connection)))
+          (is (= true (menu-model/insert-link valid-link "12345" connection)))
           ;; Does not create the resource again if the id is the same
-          (is (= false (menu-model/insert-file valid-file "12345" connection)))
-          (is (= true (menu-model/insert-file valid-file "54321" connection)))
-          (is (thrown? AssertionError (menu-model/insert-file invalid-file "54321" connection)))
-          (is (thrown? AssertionError (menu-model/insert-file invalid-file nil connection)))
-          (is (thrown? AssertionError (menu-model/insert-file invalid-file nil "not a connection")))
+          (is (= false (menu-model/insert-link valid-link "12345" connection)))
+          (is (= true (menu-model/insert-link valid-link "54321" connection)))
+          (is (thrown? AssertionError (menu-model/insert-link invalid-file "54321" connection)))
+          (is (thrown? AssertionError (menu-model/insert-link invalid-file nil connection)))
+          (is (thrown? AssertionError (menu-model/insert-link invalid-file nil "not a connection")))
           )))))
 
 

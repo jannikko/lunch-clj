@@ -7,6 +7,7 @@
             [clojure.tools.logging :as log]
             [slingshot.slingshot :refer [throw+ try+]]
             [ring.util.http-response :as res]
+            [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
             [ring.middleware.anti-forgery :refer [*anti-forgery-token* wrap-anti-forgery]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
@@ -54,9 +55,11 @@
 (defn handler
   [db]
   (-> (app-routes db)
-      (catch-all-handler)
+      ;(catch-all-handler)
+      (wrap-json-body {:keywords? true :bigdecimals? true})
+      (wrap-json-response)
       (add-csrf-token)
-      (wrap-anti-forgery)
+      ;(wrap-anti-forgery)
       (wrap-keyword-params)
       (wrap-multipart-params)
       (wrap-params)

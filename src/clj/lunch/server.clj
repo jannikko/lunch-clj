@@ -1,6 +1,5 @@
 (ns lunch.server
   (:require [lunch.handler :refer [handler]]
-            [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
             [ring.adapter.jetty :refer [run-jetty]]))
 

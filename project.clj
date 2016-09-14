@@ -8,6 +8,7 @@
                  [org.slf4j/slf4j-api "1.6.4"]
                  [ch.qos.logback/logback-classic "1.0.1"]
                  [reagent "0.5.1"]
+                 [ring/ring-json "0.4.0"]
                  [binaryage/devtools "0.6.1"]
                  [re-frame "0.7.0"]
                  [secretary "1.2.3"]
