@@ -33,7 +33,6 @@
           (catch Exception e (do (log/error (.getMessage e) request)
                                  (res/internal-server-error))))))
 
-
 (defn add-csrf-token
   "Adds CSRF Token to the response header of get requests"
   [app]
@@ -55,7 +54,7 @@
 (defn handler
   [db]
   (-> (app-routes db)
-      ;(catch-all-handler)
+      (catch-all-handler)
       (wrap-json-body {:keywords? true :bigdecimals? true})
       (wrap-json-response)
       (add-csrf-token)

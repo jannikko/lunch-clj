@@ -1,8 +1,7 @@
 (ns lunch.api.menu
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [secretary.core :refer [defroute]])
-  (:require [cljs-http.client :as http]
-            [lunch.api.handlers :refer [wrap-get-handler wrap-post-handler]]
+  (:require [lunch.api.handlers :refer [wrap-get-handler wrap-post-handler]]
             [re-frame.core :as re-frame :refer [dispatch]]
             [cljs.core.async :as async :refer [<! >! put! chan]]))
 
@@ -13,9 +12,9 @@
   {:url (str (menu (get-in db [:view :place-id])) "/download")})
 
 (defn upload-menu
-  [db file]
-  {:url (str (menu (get-in db [:view :place-id])) "/upload")
-   :params {:multipart-params [["file" file]]}})
+  [db link]
+  {:url    (str (menu (get-in db [:view :place-id])) "/upload")
+   :params {:json-params {"link" link}}})
 
 (re-frame/register-handler
  :api-menu/get-one

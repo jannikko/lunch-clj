@@ -1,7 +1,7 @@
 {
  :server {:port 3500 :join? false}
  :db {:spec 
-      {:maximum-pool-size  3
+      {:maximum-pool-size  1
        :adapter            "postgresql"
        :username           "lunch"
        :database-name      "lunch"

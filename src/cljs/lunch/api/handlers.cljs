@@ -27,7 +27,7 @@
   [handler]
   (fn [db [_ callback-handler & args]]
     (go
-      (let [request (handler db args)
+      (let [request (apply handler db args)
             request-with-csrf (assoc-csrf request (:csrf-token db))
             response (<! (http/post (:url request-with-csrf) (:params request-with-csrf)))]
         (dispatch [:api-handlers/handle-post-response response callback-handler])))
