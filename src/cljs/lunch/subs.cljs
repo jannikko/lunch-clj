@@ -40,6 +40,11 @@
     (reaction (get-in @db [:view :menu-link-input]))))
 
 (re-frame/register-sub
+  :detail-result
+  (fn [db _]
+    (reaction (get-in @db [:view :detail-result]))))
+
+(re-frame/register-sub
  :url-params
  (fn [db _]
    (reaction (:url-params @db))))
