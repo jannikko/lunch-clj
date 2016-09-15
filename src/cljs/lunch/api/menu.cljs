@@ -8,12 +8,12 @@
 (defn menu [id] (str "api/menu/" id))
 
 (defn get-one
-  [db]
-  {:url (str (menu (get-in db [:view :place-id])) "/download")})
+  [_ place-id]
+  {:url (str (menu place-id) "/download")})
 
 (defn upload-menu
-  [db link]
-  {:url    (str (menu (get-in db [:view :place-id])) "/upload")
+  [_ link place-id]
+  {:url    (str (menu place-id) "/upload")
    :params {:json-params {"link" link}}})
 
 (re-frame/register-handler

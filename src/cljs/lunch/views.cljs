@@ -25,7 +25,7 @@
   (dispatch [:initialize-places-service (reagent/dom-node this)]))
 
 (defn places-service-node []
-  (reagent/create-class {:reagent-render places-service-node-render
+  (reagent/create-class {:reagent-render      places-service-node-render
                          :component-did-mount places-service-node-did-mount}))
 
 
@@ -36,7 +36,7 @@
   (let [params (re-frame/subscribe [:url-params])]
     (dispatch [:initialize-home-view @params])))
 
-(defn home-panel-render[]
+(defn home-panel-render []
   (let [query (re-frame/subscribe [:query])]
     (fn []
       [:div [:h1 "What would you like to eat today?"]
@@ -47,7 +47,7 @@
 
 
 (defn home-panel []
-  (reagent/create-class {:reagent-render home-panel-render
+  (reagent/create-class {:reagent-render      home-panel-render
                          :component-did-mount home-panel-did-mount
                          }))
 
@@ -55,22 +55,29 @@
 
 
 (defn detail-panel-render []
-  (let [place-id (re-frame/subscribe [:place-id])]
+  (let [menu-link (re-frame/subscribe [:menu-link])
+        menu-link-input (re-frame/subscribe [:menu-link-input])]
     (fn []
-      [:div (str "This is the Detail Page for: " @place-id)
+      [:div (str "This is the Detail Page for: ")
        [:div [:a {:href "#/"} "go to Home Page"]]
-       [:input {:type "text" :id "file" :on-key-press #(when (-> % .-charCode (= 13))
-                                                        (dispatch [:handle-link-submit (-> % .-target .-value)])
-                                                        (-> % .-preventDefault))}]])))
+       (if-not (some? @menu-link) [:input {:type         "text"
+                                           :value        @menu-link-input
+                                           :id           "file"
+                                           :on-change    #(dispatch [:menu-link-input-changed (-> % .-target .-value)])
+                                           :on-key-press #(when (-> % .-charCode (= 13))
+                                                           (dispatch [:menu-link-input-submit])
+                                                           (-> % .-preventDefault))}]
+                                  [:a {:href @menu-link} @menu-link]
+                                  )])))
 
 (defn detail-panel-did-mount
   [this]
   (let [params (re-frame/subscribe [:url-params])]
-      (dispatch [:initialize-detail-view @params])))
+    (dispatch [:initialize-detail-view @params])))
 
 
 (defn detail-panel []
-  (reagent/create-class {:reagent-render detail-panel-render
+  (reagent/create-class {:reagent-render      detail-panel-render
                          :component-did-mount detail-panel-did-mount
                          }))
 

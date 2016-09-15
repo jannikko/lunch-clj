@@ -30,6 +30,16 @@
    (reaction (get-in @db [:view :place-id]))))
 
 (re-frame/register-sub
+  :menu-link
+  (fn [db _]
+    (reaction (get-in @db [:view :menu-link]))))
+
+(re-frame/register-sub
+  :menu-link-input
+  (fn [db _]
+    (reaction (get-in @db [:view :menu-link-input]))))
+
+(re-frame/register-sub
  :url-params
  (fn [db _]
    (reaction (:url-params @db))))

@@ -93,27 +93,33 @@
 (re-frame/register-handler
  :initialize-detail-view
  (fn [db [_ params]]
-   (dispatch [:api-menu/get-one :handle-menu-api-response])
+   (dispatch [:api-menu/get-one :handle-menu-api-response (:id params)])
    (assoc db :view {:place-id (:id params)})))
-
 
 (re-frame/register-handler
  :handle-menu-api-response
  (fn [db [_ response]]
-   (.log js/console response)
-   db))
+   (if (-> response :status (= 200))
+     (-> db (assoc-in [:view :menu-link] (-> response :body :link)))
+     db)))
 
 (re-frame/register-handler
  :handle-link-upload-response
  (fn [db [_ response]]
    (if (-> response :status (= 201))
-     (-> db (assoc-in [:view :menu-link] (-> response :body :link)))
+     (dispatch [:api-menu/get-one :handle-menu-api-response (get-in db [:view :place-id])])
      db)))
 
+(re-frame/register-handler
+  :menu-link-input-changed
+  (fn [db [_ input]]
+    (assoc-in db [:view :menu-link-input] input)))
 
 (re-frame/register-handler
- :handle-link-submit
- (fn [db [_ link]]
-     (when link
-       (dispatch [:api-menu/upload-menu :handle-link-upload-response link]))
-   db))
+ :menu-link-input-submit
+ (fn [db _]
+   (let [link (get-in db [:view :menu-link-input])
+         place-id (get-in db [:view :place-id])]
+     (if (some? link)
+       (dispatch [:api-menu/upload-menu :handle-link-upload-response link place-id])
+       db))))
