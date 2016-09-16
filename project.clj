@@ -21,6 +21,7 @@
                  [slingshot "0.12.2"]
                  [yesql "0.5.3"]
                  [ring "1.4.0"]
+                 [commons-validator "1.5.1"]
                  [com.stuartsierra/component "0.3.1"]
                  [metosin/ring-http-response "0.8.0"]
                  [ring/ring-mock "0.3.0"]

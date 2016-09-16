@@ -1,5 +1,6 @@
 (ns lunch.routes.menu
   (:import  [java.io IOException]
+            [org.apache.commons.validator.routines UrlValidator]
             [java.sql SQLException])
   (:require [clojure.string :refer [blank? join]]
             [clojure.spec :as s]
@@ -13,8 +14,10 @@
 
 (def link-upload-error (ApplicationException 500 "Link could not be uploaded, please try again"))
 
+(def url-validator (UrlValidator. (into-array ["http" "https"])))
+
 (s/def ::id (s/and string? (complement blank?)))
-(s/def ::link (s/and string? (complement blank?)))
+(s/def ::link (s/and string? #(.isValid url-validator %)))
 (s/def ::menu-upload-params (s/keys :req-un [::id]))
 (s/def ::menu-upload-body (s/keys :req-un [::link]))
 (s/def ::menu-upload-request (s/keys :req-un [::params ::body]))
