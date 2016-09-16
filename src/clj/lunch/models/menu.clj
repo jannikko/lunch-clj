@@ -1,5 +1,6 @@
 (ns lunch.models.menu
   (:require [yesql.core :refer [defqueries]]
+            [lunch.shared-specs]
             [clojure.spec :as s]))
 
 (defqueries "lunch/models/sql/menu.sql")
@@ -12,7 +13,7 @@
   "Saves a file if it does not exist yet"
   ([link place-id conn]
    {:pre  [(s/valid? :lunch.routes.menu/link link)
-           (s/valid? :lunch.routes.menu/id place-id)]
+           (s/valid? :lunch.shared-specs/place-id place-id)]
     :post [(s/valid? boolean? %)]}
    (if (exists? place-id conn)
      false

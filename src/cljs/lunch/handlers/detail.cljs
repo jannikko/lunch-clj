@@ -59,3 +59,13 @@
         (dispatch [:api-menu/upload-menu :handle-link-upload-response link place-id])
         db))))
 
+(re-frame/register-handler
+  :handle-session-response
+  (fn [db [_ response]]
+    (do (.log js/console response)
+      db)))
+
+(re-frame/register-handler
+  :generate-lunch-session
+  (fn [db _]
+      (dispatch [:api-session/create-session :handle-session-response (get-in db [:view :place-id])])))

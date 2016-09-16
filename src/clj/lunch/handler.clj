@@ -1,5 +1,6 @@
 (ns lunch.handler
   (:require [lunch.routes.menu :as menu-routes]
+            [lunch.routes.session :as session-routes]
             [ring.util.response :refer [resource-response content-type]]
             [lunch.exceptions :refer [application-exception-type]]
             [compojure.core :refer :all]
@@ -16,7 +17,6 @@
             [ring.middleware.reload :refer [wrap-reload]]))
 
 ;; Write general tests that use ring/mock for handler
-;; Respond with json
 ;; Use clojurewerkz/route-one for bidirectional routing
 
 (def CSRF-HEADER "x-csrf-token")
@@ -47,7 +47,8 @@
   (routes
     (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
     (context "/api" []
-      (context "/menu" [] (menu-routes/handler db)))
+      (context "/menu" [] (menu-routes/handler db))
+      (context "/session" [] (session-routes/handler db)))
     (route/resources "/")
     (route/not-found "Page not found")))
 

@@ -12,9 +12,10 @@
   (= (:status res) code))
 
 (def db (new-database {:datasource "whatever"}))
-(def good-request {:params {:id "123145"} :body {:link "test"}})
-(def bad-request1 {:params {} :body {:link "test"}})
-(def bad-request2 {:params {:id "123145"} :body {}})
+(def good-request {:params {:id "123145"} :body {:link "http://example.com"}})
+(def bad-request1 {:params {} :body {:link "http://example.com"}})
+(def bad-request2 {:params {:id "123145"} :body {:link "invalidurl"}})
+(def bad-request3 {:params {:id "123145"} :body {}})
 
 (def connection {:connection (reify Connection)})
 
@@ -25,18 +26,19 @@
       (is (thrown? AssertionError (menu-upload nil db)))
       (is (thrown? AssertionError (menu-upload bad-request1 db)))
       (is (thrown? AssertionError (menu-upload bad-request2 db)))
+      (is (thrown? AssertionError (menu-upload bad-request3 db)))
       ;; Link does not exist yet
       (with-redefs-fn {#'lunch.models.menu/insert-link (constantly true)
-                       #'lunch.db/get-connection                     (constantly connection)}
+                       #'lunch.db/get-connection       (constantly connection)}
         #(is (response? 201 (menu-upload good-request db))))
       ;; Link does already exist
       (with-redefs-fn {#'lunch.models.menu/insert-link (constantly false)
-                       #'lunch.db/get-connection                     (constantly connection)}
+                       #'lunch.db/get-connection       (constantly connection)}
         #(is (response? 409 (menu-upload good-request db))))
       ;; Error while trying to insert the Link
       (with-redefs-fn {#'lunch.models.menu/insert-link (fn [t1 t2 t3] (throw (IOException. "Fails")))
-                       #'lunch.db/get-connection                     (constantly connection)}
-        #(is (thrown+? application-exception? (menu-upload good-request db)))) )
+                       #'lunch.db/get-connection       (constantly connection)}
+        #(is (thrown+? application-exception? (menu-upload good-request db)))))
     (testing "menu-download"
       (is (thrown? AssertionError (menu-download nil db)))
       ;; Returns empty when not found in db

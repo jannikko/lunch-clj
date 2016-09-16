@@ -6,6 +6,7 @@
             [clojure.spec :as s]
             [clojure.tools.logging :as log]
             [ring.util.http-response :as res]
+            [lunch.shared-specs]
             [lunch.models.menu :as menu-model]
             [lunch.exceptions :refer :all]
             [lunch.db :refer [get-connection get-datasource]]
@@ -16,19 +17,15 @@
 
 (def url-validator (UrlValidator. (into-array ["http" "https"])))
 
-(s/def ::id (s/and string? (complement blank?)))
 (s/def ::link (s/and string? #(.isValid url-validator %)))
-(s/def ::menu-upload-params (s/keys :req-un [::id]))
+(s/def ::menu-upload-params (s/keys :req-un [:lunch.shared-specs/place-id]))
 (s/def ::menu-upload-body (s/keys :req-un [::link]))
 (s/def ::menu-upload-request (s/keys :req-un [::params ::body]))
-
-(defn menu-get [request]
-  (res/ok request))
 
 (defn menu-download
   "Handler for menu downloads, retrieves the link from the db and sends it back"
   [id db]
-  {:pre [(s/valid? ::id id)]}
+  {:pre [(s/valid? :lunch.shared-specs/place-id id)]}
   (let [query-result (first (menu-model/find-by-id {:id id} (get-connection db)))]
     (if (empty? query-result)
       (res/not-found)
@@ -52,6 +49,5 @@
 (defn handler
   [db]
   (routes
-    (GET "/:id" [request] (menu-get request))
     (GET "/:id/download" [id] (menu-download id db))
       (POST "/:id/upload" request (menu-upload request db))))

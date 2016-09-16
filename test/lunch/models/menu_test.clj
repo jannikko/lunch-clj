@@ -12,8 +12,8 @@
 
 (def connection {:connection (proxy [Connection] [] (constantly nil))})
 
-(def valid-link "www.example.com")
-(def invalid-file {})
+(def valid-link "http://www.example.com")
+(def invalid-link "http://www.example")
 
 (deftest menu-routes
   (testing "menu-model"
@@ -26,9 +26,8 @@
           ;; Does not create the resource again if the id is the same
           (is (= false (menu-model/insert-link valid-link "12345" connection)))
           (is (= true (menu-model/insert-link valid-link "54321" connection)))
-          (is (thrown? AssertionError (menu-model/insert-link invalid-file "54321" connection)))
-          (is (thrown? AssertionError (menu-model/insert-link invalid-file nil connection)))
-          (is (thrown? AssertionError (menu-model/insert-link invalid-file nil "not a connection")))
+          (is (thrown? AssertionError (menu-model/insert-link invalid-link "54321" connection)))
+          (is (thrown? AssertionError (menu-model/insert-link valid-link nil connection)))
           )))))
 
 
