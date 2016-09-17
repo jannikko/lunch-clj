@@ -1,9 +1,12 @@
 (ns lunch.models.menu-test
-  (:import [java.io File]
+  (:import [clojure.lang ExceptionInfo]
            [java.sql Connection])
   (:require [lunch.routes.menu :refer :all]
             [lunch.models.menu :as menu-model]
+            [lunch.test-fixtures :refer [general-fixtures]]
             [clojure.test :refer :all]))
+
+(general-fixtures)
 
 ;; Mock SQL with in-memory store
 (def mock-db (atom []))
@@ -11,7 +14,6 @@
 (def mock-insert! (fn [object conn] (swap! mock-db conj object)))
 
 (def connection {:connection (proxy [Connection] [] (constantly nil))})
-
 (def valid-link "http://www.example.com")
 (def invalid-link "http://www.example")
 
@@ -26,8 +28,8 @@
           ;; Does not create the resource again if the id is the same
           (is (= false (menu-model/insert-link valid-link "12345" connection)))
           (is (= true (menu-model/insert-link valid-link "54321" connection)))
-          (is (thrown? AssertionError (menu-model/insert-link invalid-link "54321" connection)))
-          (is (thrown? AssertionError (menu-model/insert-link valid-link nil connection)))
+          (is (thrown? ExceptionInfo (menu-model/insert-link invalid-link "54321" connection)))
+          (is (thrown? ExceptionInfo (menu-model/insert-link valid-link nil connection)))
           )))))
 
 

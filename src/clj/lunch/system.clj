@@ -10,8 +10,7 @@
     :database (new-database (:db config))
     :server (component/using
               (new-server (:server config))
-              [:database])
-    ))
+              [:database])))
 
 (def system (system-config env))
 

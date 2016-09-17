@@ -1,7 +1,9 @@
 (defproject lunch "0.1.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha12"]
                  [org.clojure/clojurescript "1.9.227"]
                  [org.clojure/core.async "0.2.374"]
+                 [org.clojure/java.jdbc "0.6.2-alpha3"]
+                 [org.clojure/test.check "0.9.0"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [hikari-cp "1.7.3"]
                  [org.clojure/tools.logging  "0.3.1"]
@@ -16,7 +18,6 @@
                  [clojurewerkz/route-one "1.2.0"]
                  [cljs-http "0.1.41"]
                  [yogthos/config "0.8"]
-                 [postgresql "9.3-1102.jdbc41"]
                  [ragtime "0.6.0"]
                  [slingshot "0.12.2"]
                  [yesql "0.5.3"]
@@ -50,7 +51,7 @@
 
   :profiles
   {:dev
-   {:dependencies []
+   {:dependencies [[org.clojure/test.check "0.9.0"]]
     :resource-paths ["src/config/dev"]
     :plugins      [[lein-figwheel "0.5.4-3"]]
     :main user
