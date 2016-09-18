@@ -6,7 +6,6 @@
                  [org.clojure/test.check "0.9.0"]
                  [org.clojure/tools.logging  "0.3.1"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
-                 [aleph "0.4.2-alpha8"]
                  [hikari-cp "1.7.3"]
                  [org.slf4j/slf4j-api "1.6.4"]
                  [ch.qos.logback/logback-classic "1.0.1"]

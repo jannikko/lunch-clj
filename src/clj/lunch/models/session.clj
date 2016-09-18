@@ -4,4 +4,3 @@
             [clojure.spec :as s]))
 
 (defqueries "lunch/models/sql/session.sql")
-
