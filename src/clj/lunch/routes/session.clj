@@ -11,7 +11,6 @@
             [lunch.specs]
             [lunch.models.session :as session-model]
             [ring.util.http-response :as res]
-            [slingshot.slingshot :refer [throw+]]
             [compojure.core :refer :all]))
 
 (s/def ::body (s/keys :req-un [:lunch.specs/id]))
@@ -29,9 +28,9 @@
     (try (do (session-model/insert-session-id! {:id uuid :place_id place-id} conn)
              (res/created (str uuid)))
          (catch IOException e (do (log/error (join " " ["Connection error writing session id into db for" place-id (.getMessage e)]))
-                                  (throw+ generate-session-error)))
+                                  (throw generate-session-error)))
          (catch SQLException e (do (log/error (join " " ["Error inserting session into the databasee" place-id (.getMessage e)]))
-                                   (throw+ generate-session-error))))))
+                                   (throw generate-session-error))))))
 
 (defn handler
   [db]

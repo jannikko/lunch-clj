@@ -1,14 +1,13 @@
 (ns lunch.handler-test
   (:require [lunch.handler :refer [catch-all-handler]]
             [lunch.exceptions :refer [ApplicationException]]
-            [slingshot.slingshot :refer [throw+]]
             [clojure.test :refer :all]))
 
 (def mock-request {})
 
-(defn throw-assertion-err [request] (throw (AssertionError. "Validation failed")))
+(defn throw-assertion-err [request] (throw (ex-info "Validation failed" {})))
 (defn throw-exception [request] (throw (Exception. "Critical exception")))
-(defn throw-application-error [request] (throw+ (ApplicationException 407 "Application Exception")))
+(defn throw-application-error [request] (throw (ApplicationException 407 "Application Exception")))
 
 (deftest handler
   (testing "handler"

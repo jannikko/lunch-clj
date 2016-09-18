@@ -2,11 +2,10 @@
   (:require [lunch.routes.menu :as menu-routes]
             [lunch.routes.session :as session-routes]
             [ring.util.response :refer [resource-response content-type]]
-            [lunch.exceptions :refer [application-exception-type]]
+            [lunch.exceptions :refer [application-exception-type application-exception?]]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.tools.logging :as log]
-            [slingshot.slingshot :refer [throw+ try+]]
             [ring.util.http-response :as res]
             [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
             [ring.middleware.anti-forgery :refer [*anti-forgery-token* wrap-anti-forgery]]
@@ -14,7 +13,8 @@
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.reload :refer [wrap-reload]]))
+            [ring.middleware.reload :refer [wrap-reload]])
+  (:import [clojure.lang ExceptionInfo]))
 
 ;; Write general tests that use ring/mock for handler
 ;; Use clojurewerkz/route-one for bidirectional routing
@@ -25,13 +25,14 @@
   "Adds CSRF Token to the response header of get requests"
   [handler]
   (fn [request]
-    (try+ (handler request)
-          (catch [:type application-exception-type] {:keys [code message]}
-            {:status code :headers {} :body message})
-          (catch AssertionError e (do (log/error (.getMessage e) request)
-                                      (res/bad-request)))
-          (catch Exception e (do (log/error (.getMessage e) request)
-                                 (res/internal-server-error))))))
+    (try (handler request)
+         (catch ExceptionInfo e (if (application-exception? e)
+                                  (let [code (-> e ex-data :code)]
+                                    {:status code :headers {} :body (.getMessage e)})
+                                  (do (log/error (.getMessage e) request)
+                                      (res/bad-request))))
+         (catch Exception e (do (log/error (.getMessage e) request)
+                                (res/internal-server-error))))))
 
 (defn add-csrf-token
   "Adds CSRF Token to the response header of get requests"

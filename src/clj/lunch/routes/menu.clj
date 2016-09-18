@@ -10,7 +10,6 @@
             [lunch.models.menu :as menu-model]
             [lunch.exceptions :refer :all]
             [lunch.db :refer [get-connection get-datasource]]
-            [slingshot.slingshot :refer [throw+]]
             [compojure.core :refer :all]))
 
 (def url-validator (UrlValidator. (into-array ["http" "https"])))
@@ -37,12 +36,12 @@
   (let [id (-> request :params :id) link (-> request :body :link)]
     (try
       (if (menu-model/insert-link link id (get-connection db))
-        (res/created)
+        (res/created id)
         (res/conflict))
       (catch IOException e (do (log/warn (join " " ["Error writing link" id link (.getMessage e)]))
-                               (throw+ link-upload-error)))
+                               (throw link-upload-error)))
       (catch SQLException e (do (log/warn (join " " ["Error inserting entry into the databasee" id link (.getMessage e)]))
-                                (throw+ link-upload-error))))))
+                                (throw link-upload-error))))))
 
 
 (defn handler

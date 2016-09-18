@@ -2,6 +2,7 @@
   (:require [config.core :refer [env]]
             [lunch.db :refer [new-database]]
             [lunch.server :refer [new-server]]
+            [clojure.spec :refer [check-asserts]]
             [com.stuartsierra.component :as component]))
 
 (defn system-config
@@ -15,4 +16,5 @@
 (def system (system-config env))
 
 (defn -main [& args]
-  (component/start system))
+  (do (check-asserts true)
+      (component/start system)))

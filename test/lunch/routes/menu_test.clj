@@ -6,7 +6,6 @@
             [lunch.models.menu :as menu-model]
             [lunch.db :refer [new-database]]
             [lunch.exceptions :refer :all]
-            [slingshot.test]
             [lunch.test-fixtures :refer [general-fixtures]]
             [clojure.test :refer :all]))
 
@@ -41,7 +40,7 @@
       ;; Error while trying to insert the Link
       (with-redefs-fn {#'lunch.models.menu/insert-link (fn [t1 t2 t3] (throw (IOException. "Fails")))
                        #'lunch.db/get-connection       (constantly connection)}
-        #(is (thrown+? application-exception? (menu-upload good-request db)))))
+        #(is (thrown? ExceptionInfo (menu-upload good-request db)))))
     (testing "menu-download"
       (is (thrown? ExceptionInfo (menu-download nil db)))
       ;; Returns empty when not found in db

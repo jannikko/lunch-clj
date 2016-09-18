@@ -3,7 +3,6 @@
   (:require [lunch.routes.session :refer :all]
             [lunch.db :refer [new-database]]
             [lunch.exceptions :refer :all]
-            [slingshot.test]
             [lunch.test-fixtures :refer [general-fixtures]]
             [clojure.test :refer :all]))
 
