@@ -19,16 +19,16 @@
 
 (deftest menu-routes
   (testing "session-routes"
-    (testing "generate"
+    (testing "generate-session"
       ;; Test input validation
-      (is (thrown? ExceptionInfo (generate bad-request1 db)))
-      (is (thrown? ExceptionInfo (generate bad-request2 db)))
-      (is (thrown? ExceptionInfo (generate nil db)))
-      ;; Good request should return 201 and return new session id
-      (with-redefs-fn {#'lunch.routes.session/uuid               (constantly fake-uuid)
+      (is (thrown? ExceptionInfo (generate-session bad-request1 db)))
+      (is (thrown? ExceptionInfo (generate-session bad-request2 db)))
+      (is (thrown? ExceptionInfo (generate-session nil db)))
+      ;; Good request should return 201 and return new session non-blank-string
+      (with-redefs-fn {#'lunch.routes.session/random-uuid        (constantly fake-uuid)
                        #'lunch.models.session/insert-session-id! (constantly nil)}
-        #(do (is (response? 201 (generate good-request db)))
-          (is (= fake-uuid (get-in (generate good-request db) [:headers "Location"]))))
+        #(do (is (response? 201 (generate-session good-request db)))
+             (is (= fake-uuid (get-in (generate-session good-request db) [:headers "Location"]))))
         ))))
 
 

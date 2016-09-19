@@ -12,8 +12,8 @@
 (defn insert-link
   "Saves a file if it does not exist yet"
   ([link place-id conn]
-   {:pre  [(s/assert :lunch.routes.menu/link link)
-           (s/assert :lunch.specs/id place-id)]}
+   {:pre [(s/assert :lunch.routes.menu/link link)
+          (s/assert :lunch.specs/non-blank-string place-id)]}
    (if (exists? place-id conn)
      false
      (do (insert! {:id place-id :link link} conn)

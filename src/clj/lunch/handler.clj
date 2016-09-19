@@ -18,6 +18,7 @@
 
 ;; Write general tests that use ring/mock for handler
 ;; Use clojurewerkz/route-one for bidirectional routing
+;; Refactor responses to records -> view (business) objects
 
 (def CSRF-HEADER "x-csrf-token")
 

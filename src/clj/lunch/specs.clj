@@ -1,6 +1,5 @@
 (ns lunch.specs
   (:require [clojure.spec :as s]
-            [clojure.string :refer [blank?]]
-            ))
+            [clojure.string :refer [blank?]]))
 
-(s/def ::id (s/and string? (complement blank?)))
+(s/def ::non-blank-string (s/and string? (complement blank?)))
