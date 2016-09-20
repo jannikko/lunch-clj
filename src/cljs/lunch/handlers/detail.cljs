@@ -3,6 +3,7 @@
                    [secretary.core :refer [defroute]])
   (:require [re-frame.core :as re-frame :refer [dispatch]]
             [cljs.core.async :refer [<! >! put! chan]]
+            [lunch.routes :refer [session-route]]
             [lunch.handlers.home]))
 
 (defn places-service-detail
@@ -62,10 +63,13 @@
 (re-frame/register-handler
   :handle-session-response
   (fn [db [_ response]]
-    (do (.log js/console response)
-      db)))
+    (.log js/console (-> response :headers))
+    (when (-> response :status (= 201))
+      (.assign js/location (session-route {:id (get-in response [:headers "location"])})))
+    db))
 
 (re-frame/register-handler
   :generate-lunch-session
   (fn [db _]
-      (dispatch [:api-session/create-session :handle-session-response (get-in db [:view :place-id])])))
+      (dispatch [:api-session/create-session :handle-session-response (get-in db [:view :place-id])])
+    db))

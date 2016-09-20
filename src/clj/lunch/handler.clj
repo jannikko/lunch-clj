@@ -57,7 +57,7 @@
 (defn handler
   [db]
   (-> (app-routes db)
-      (catch-all-handler)
+      ;(catch-all-handler)
       (wrap-json-body {:keywords? true :bigdecimals? true})
       (wrap-json-response)
       (add-csrf-token)

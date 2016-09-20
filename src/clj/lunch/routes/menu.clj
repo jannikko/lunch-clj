@@ -48,5 +48,5 @@
 (defn handler
   [db]
   (routes
-    (GET "/:non-blank-string/download" [id] (menu-download id db))
-      (POST "/:non-blank-string/upload" request (menu-upload request db))))
+    (GET "/:id/download" [id] (menu-download id db))
+      (POST "/:id/upload" request (menu-upload request db))))

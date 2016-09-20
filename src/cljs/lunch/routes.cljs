@@ -24,5 +24,8 @@
   (defroute detail-route "/detail/:id" {:as params}
     (re-frame/dispatch [:set-active-panel :detail-panel params]))
 
+  (defroute session-route "/session/:id" {:as params}
+            (re-frame/dispatch [:set-active-panel :session-panel params]))
+
   ;; --------------------
   (hook-browser-navigation!))

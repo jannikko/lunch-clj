@@ -1,15 +1,15 @@
 (ns lunch.server
   (:require [lunch.handler :refer [handler]]
             [com.stuartsierra.component :as component]
-            [ring.adapter.jetty :refer [run-jetty]]))
+            [aleph.http :as http]))
 
 (defrecord Server [port database server]
   component/Lifecycle
   (start [component]
-    (let [server (run-jetty (handler database) {:port port :join? false})]
+    (let [server (http/start-server (handler database) {:port port})]
       (assoc component :server server)))
   (stop [component]
-    (.stop server)
+    (.close server)
     (assoc component :server nil)))
 
 (defn new-server

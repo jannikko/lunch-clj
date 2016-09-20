@@ -3,6 +3,7 @@
             [lunch.routes :refer [detail-route]]
             [lunch.views.home :refer [home-panel]]
             [lunch.views.detail :refer [detail-panel]]
+            [lunch.views.session :refer [session-panel]]
             [lunch.views.places-service :refer [places-service]]))
 
 ;; TODO serve html from server to embed configuration such as api keys
@@ -10,6 +11,7 @@
 (defmulti panels identity)
 (defmethod panels :home-panel [] [home-panel])
 (defmethod panels :detail-panel [] [detail-panel])
+(defmethod panels :session-panel [] [session-panel])
 (defmethod panels :default [] [:div])
 
 (defn show-panel

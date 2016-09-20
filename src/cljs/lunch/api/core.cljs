@@ -1,2 +1,3 @@
 (ns lunch.api
-  (:require [lunch.api.menu]))
+  (:require [lunch.api.menu]
+            [lunch.api.session]))

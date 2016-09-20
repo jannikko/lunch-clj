@@ -1,6 +1,6 @@
 -- name: create-table
 -- Create the place table
-CREATE TABLE menu (
+CREATE TABLE IF NOT EXISTS menu (
   id VARCHAR(255) PRIMARY KEY,
   link VARCHAR(255) NOT NULL
 );

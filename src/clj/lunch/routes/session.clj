@@ -1,11 +1,10 @@
 (ns lunch.routes.session
-  (:import [java.util UUID]
-           [java.io IOException]
-           [java.sql SQLException])
   (:require [clojure.string :refer [blank? join]]
-            [clojure.java.jdbc :as jdbc]
             [clojure.spec :as s]
-            [clojure.tools.logging :as log]
+            [aleph.http :as http]
+            [manifold.stream :as stream]
+            [manifold.deferred :as d]
+            [clojure.edn :as edn]
             [lunch.exceptions :refer :all]
             [lunch.db :refer [get-connection get-datasource]]
             [lunch.specs]
@@ -13,73 +12,71 @@
             [ring.util.http-response :as res]
             [compojure.core :refer :all]))
 
+(s/def ::session-id string?)
+(s/def ::place-id (s/get-spec :lunch.specs/non-blank-string))
 
-(defn random-uuid [] (UUID/randomUUID))
-(def generate-session-error (ApplicationException 500 "Error trying to generate-session a new session, please try again later"))
-
-(s/def :lunch.routes.session.generate/id (s/get-spec :lunch.specs/non-blank-string))
-(s/def :lunch.routes.session.generate/body (s/keys :req-un [:lunch.routes.session.generate/id]))
+(s/def :lunch.routes.session.generate/body (s/keys :req-un [::place-id]))
 (s/def :lunch.routes.session.generate/request (s/keys :req-un [:lunch.routes.session.generate/body]))
 
 (defn generate-session
   [request db]
   {:pre [(s/assert :lunch.routes.session.generate/request request)]}
-  (let [place-id (get-in request [:body :id]) uuid (random-uuid)]
-    (try (let [conn (get-connection db)]
-           (session-model/insert-session-id! {:id uuid :place_id place-id} conn)
-           (res/created (str uuid)))
-         (catch IOException e (do (log/error (join " " ["Connection error writing session non-blank-string into db for" place-id (.getMessage e)]))
-                                  (throw generate-session-error)))
-         (catch SQLException e (do (log/error (join " " ["Error inserting session into the databasee" place-id (.getMessage e)]))
-                                   (throw generate-session-error))))))
+  (let [place-id (get-in request [:body :place-id])
+        session-id (session-model/register-session place-id db)]
+    (res/created (str session-id))))
 
 (defn get-session
-  [id db]
-  (try
-    (let [session-id (UUID/fromString id)
-          sessions (session-model/find-session-entries {:session_id session-id} (get-connection db))]
-      (if (some? sessions)
-        (res/ok {:id id :session_entries (->> sessions (map #(select-keys % [:name :lunch_order])))})
-        (res/not-found)))
-    (catch IllegalArgumentException _ (throw (ex-info "Not a valid uuid" {:id id})))
-    (catch IOException e (do (log/error (join " " ["Connection error selecting uuid from table" id (.getMessage e)]))
-                             (throw generate-session-error)))
-    (catch SQLException e (do (log/error (join " " ["Error selecting uuid from table" id (.getMessage e)]))
-                              (throw generate-session-error)))))
+  [session-id]
+  {:pre [(s/assert ::session-id session-id)]}
+  (if (session-model/registered? session-id)
+    (let [sessions (session-model/read-cache session-id)]
+      (res/ok {:session-id      session-id
+               :place-id        (:place-id sessions)
+               :session-entries (:session-entries sessions)}))
+    (res/not-found)))
 
 ;; Move these into view object / protocol
-(s/def :lunch.routes.session.upload/lunch_order (s/conformer string?))
+(s/def :lunch.routes.session.upload/lunch-order (s/conformer string?))
 (s/def :lunch.routes.session.upload/name (s/conformer string?))
-(s/def :lunch.routes.session.upload/id (s/get-spec number?))
-(s/def :lunch.routes.session.upload/body (s/keys :req-un [:lunch.routes.session.upload/lunch_order
-                                                         :lunch.routes.session.upload/name]
-                                                :opt-un [:lunch.routes.session.uploads/id]))
-(s/def :lunch.routes.session.upload/params (s/keys :req-un [:lunch.routes.session.upload/id]))
-(s/def :lunch.routes.session.upload/request (s/keys :req-un [:lunch.routes.session.upload/body :lunch.routes.session.upload/params]))
-
+(s/def :lunch.routes.session.upload/entry-id (s/conformer number?))
+(s/def :lunch.routes.session.upload/session-entry (s/keys :req-un [:lunch.routes.session.upload/lunch-order
+                                                          :lunch.routes.session.upload/name]
+                                                 :opt-un [:lunch.routes.session.uploads/entry-id]))
 (defn upload-session-entry
-  [{:keys [body params] :as request} db]
-  {:pre [(s/assert :lunch.routes.session.upload/request request)]}
+  [{:keys [session-id entry-id name lunch-order] :as request }]
+  {:pre [(s/assert :lunch.routes.session.upload/session-entry request)]}
   (try
-    (let [session-id (UUID/fromString (:id params))
-          {:keys [id name lunch_order]} body]
-      (if-not (nil? id)
-        ;; Update the existing entry
-        (do (session-model/update-session-entry! {:id id :name name :lunch_order lunch_order} (get-connection db))
-            (res/ok))
-        ;; Create a new entry
-        (let [entry-id (session-model/insert-session-entry<! {:name name :lunch_order lunch_order :session_id session-id} (get-connection db))]
-          (res/created (:id entry-id)))))
-    (catch IllegalArgumentException e (do (log/error (.getMessage e))
-                                          (throw (ex-info "Invalid UUID" {}))))
-    (catch IOException e (do (log/error (join " " ["Connection error selecting uuid from table" (.getMessage e)]))
-                             (throw generate-session-error)))
-    (catch SQLException e (do (log/error (join " " ["Error selecting uuid from table" (.getMessage e)]))
-                              (throw generate-session-error)))))
+    (if-not (session-model/registered? session-id)
+      (res/not-found)
+      (if (nil? entry-id)
+        (let [entry-id (session-model/insert-cache {:name name :lunch-order lunch-order :session-id session-id})]
+          (res/created entry-id))
+        (do (session-model/update-cache {:session-id session-id :name name :lunch-order lunch-order :entry-id entry-id})
+            (res/ok))))))
+
+
+(s/def :lunch.routes.session.connect/params (s/keys :req-un [::session-id]))
+(s/def :lunch.routes.session.connect/request (s/keys :req-un [:lunch.routes.session.upload/params]))
+
+(defn connect
+  [request]
+  {:pre [(s/assert :lunch.routes.session.connect/request request)]}
+  (let [session-id (-> request :params :session-id)]
+    (if-not (session-model/registered? session-id)
+      (res/not-found)
+      (d/let-flow [conn (d/catch (http/websocket-connection request) (fn [_] nil))]
+                  (if-not conn
+                    ;; if it wasn't a valid websocket handshake, return an error
+                    (res/internal-server-error "Error establishing websocket connection.")
+                    ;; otherwise, take the first two messages, which give us the chatroom and name
+                    (do (session-model/register-connection session-id conn)
+                        (stream/consume #(upload-session-entry (-> % (edn/read-string) (assoc :session-id session-id))) conn))
+                    )))))
 
 (defn handler
   [db]
   (routes
     (POST "/generate" request (generate-session request db))
-    (GET "/get-session" [id] (get-session id db))
-    (PUT "/upload-session-entry" request (upload-session-entry request db))))
+    (GET "/:session-id" [session-id] (get-session session-id))
+    (GET "/:session-id/connect" request (connect request))
+    (PUT "/:session-id" request (upload-session-entry request))))
