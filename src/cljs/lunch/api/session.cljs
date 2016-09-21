@@ -29,6 +29,5 @@
     ;; TODO Move this to configuration
     (go (let [{:keys [ws-channel error]} (<! (ws-ch (str "ws://localhost:3500/api/session/" session-id "/connect")))]
         (if-not error
-          (dispatch [callback ws-channel])
-          (js/console.log "Error:" (pr-str error)))))
+          (dispatch [callback ws-channel]))))
     db))

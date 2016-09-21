@@ -44,7 +44,6 @@
       (catch SQLException e (do (log/warn (join " " ["Error inserting entry into the databasee" id link (.getMessage e)]))
                                 (throw link-upload-error))))))
 
-
 (defn handler
   [db]
   (routes

@@ -45,7 +45,6 @@
 (re-frame/register-handler
   :handle-session-response
   (fn [db [_ response]]
-    (.log js/console (-> response :headers))
     (when (-> response :status (= 201))
       (.assign js/location (session-route {:id (get-in response [:headers "location"])})))
     db))

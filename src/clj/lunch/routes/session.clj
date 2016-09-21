@@ -2,6 +2,7 @@
   (:require [clojure.string :refer [blank? join]]
             [clojure.spec :as s]
             [clojure.edn :as edn]
+            [clojure.tools.logging :as log]
             [manifold.stream :as stream]
             [manifold.deferred :as d]
             [aleph.http :as http]
@@ -18,7 +19,7 @@
   (let [registered-conns (session-model/get-connections session-id)
         session (get new-value session-id)
         entries (view/render-entries session)]
-    (doseq [conn registered-conns] (stream/put! conn (pr-str entries)))))
+    (doseq [conn (vals registered-conns)] (stream/put! conn (pr-str entries)))))
 
 (s/def ::session-id string?)
 (s/def ::place-id (s/get-spec :lunch.specs/non-blank-string))
@@ -69,14 +70,15 @@
   (let [session-id (-> request :params :session-id)]
     (if-not (session-model/registered? session-id)
       (res/not-found)
-      (d/let-flow [conn (d/catch (http/websocket-connection request) (fn [_] nil))]
+      (d/let-flow [conn (d/catch (http/websocket-connection request) (fn [_] (do (log/debug "catch handler called") nil)))]
                   (if-not conn
                     ;; if it wasn't a valid websocket handshake, return an error
                     (res/internal-server-error "Error establishing websocket connection.")
                     ;; otherwise, take the first two messages, which give us the chatroom and name
                     (do (stream/put! conn (-> session-id session-model/read-cache view/render-entries pr-str))
                         (session-model/register-connection session-id conn)
-                        (stream/consume #(upload-session-entry (-> % (edn/read-string) (assoc :session-id session-id))) conn))
+                        (stream/consume #(upload-session-entry (-> % (edn/read-string) (assoc :session-id session-id))) conn)
+                        (res/ok))
                     )))))
 
 (defn handler
