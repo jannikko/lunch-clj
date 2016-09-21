@@ -2,6 +2,7 @@
   (:require [re-frame.core :as re-frame :refer [dispatch]]
             [reagent.core :as reagent]
             [reagent.ratom :refer [reaction]]
+            [lunch.views.components.place :refer [place-map place-contact]]
             [clojure.string :refer [split]]))
 
 (defn session-panel-did-mount []
@@ -13,23 +14,32 @@
         order-input (re-frame/subscribe [:lunch.subs.session/order-input])]
     (fn []
       [:div
-       [:input {:type      "text" :id "name" :placeholder "Name" :value @name-input
-                :on-change #(dispatch [:lunch.handlers.session/name-input-changed (-> % .-target .-value)])}]
-       [:input {:type      "text" :id "order" :placeholder "Order" :value @order-input
-                :on-change #(dispatch [:lunch.handlers.session/order-input-changed (-> % .-target .-value)])}]
-       [:button {:on-click #(dispatch [:lunch.handlers.session/update-session-handler])}]])))
+       [:form {:on-submit #(do (.preventDefault %)
+                               (dispatch [:lunch.handlers.session/update-session-handler]))}
+        [:input {:type      "text" :id "name" :placeholder "Name" :value @name-input
+                 :on-change #(dispatch [:lunch.handlers.session/name-input-changed (-> % .-target .-value)])}]
+        [:input {:type      "text" :id "order" :placeholder "Order" :value @order-input
+                 :on-change #(dispatch [:lunch.handlers.session/order-input-changed (-> % .-target .-value)])}]
+        [:input {:type "submit"}]]])))
+
+(defn session-entry
+  [entry]
+  [:div [:span (:name entry)] " " [:span (:lunch-order entry)]])
 
 (defn session-state-view []
   (let [session-state (re-frame/subscribe [:session-state])]
     (fn []
-      [:div (str @session-state)])))
+      [:div (->> @session-state (sort-by :row) (reverse) (map session-entry))])))
 
 (defn session-panel-render []
-  (let [session-id (re-frame/subscribe [:session-id])]
+  (let [place-id (re-frame/subscribe [:place-id])]
     (fn []
-      [:div [:h1 (str "Lunch session " @session-id)]
+      [:div
+       [place-contact]
        [add-stuff]
-       [session-state-view]])))
+       [session-state-view]
+       [place-map place-id]
+       ])))
 
 (defn session-panel []
   (reagent/create-class {:reagent-render      session-panel-render

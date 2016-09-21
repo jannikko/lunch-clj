@@ -4,6 +4,7 @@
             [lunch.handlers.detail]
             [lunch.handlers.places-service]
             [lunch.handlers.session]
+            [lunch.handlers.components.place]
             [lunch.db :as db]))
 
 ;; Initialize the default db

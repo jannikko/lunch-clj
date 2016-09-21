@@ -10,9 +10,17 @@
   {:url    "api/session/generate"
    :params {:json-params {"place-id" place-id}}})
 
+(defn session-metadata
+  [_ session-id]
+  {:url    (str "api/session/" session-id)})
+
 (re-frame/register-handler
   :api-session/create-session
   (wrap-post-handler create-session))
+
+(re-frame/register-handler
+  :api-session/session-metadata
+  (wrap-get-handler session-metadata))
 
 (re-frame/register-handler
   :api-session/connect

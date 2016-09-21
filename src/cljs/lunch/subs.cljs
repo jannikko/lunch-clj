@@ -2,6 +2,7 @@
     (:require-macros [reagent.ratom :refer [reaction]])
     (:require [re-frame.core :as re-frame]
               [lunch.subs.detail]
+              [lunch.subs.components.place]
               [lunch.subs.session]
               [lunch.subs.home]))
 

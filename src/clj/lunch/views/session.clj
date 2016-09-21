@@ -5,7 +5,7 @@
   (let [session-entries (:session-entries session)]
     (->> session-entries
          (into [])
-         (map (fn [[row-num entry]] (assoc entry :row-num row-num))))))
+         (map (fn [[row-num entry]] (assoc entry :row row-num))))))
 
 (defn render-metadata
   [session]

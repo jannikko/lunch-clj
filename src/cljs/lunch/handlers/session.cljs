@@ -39,6 +39,15 @@
     (assoc-in db [:view :order-input] input)))
 
 (re-frame/register-handler
+  ::handle-session-metadata-response
+  (fn [db [_ response]]
+    (if (= (:status response) 200)
+      (let [place-id (-> response :body :place-id)]
+        (dispatch [:lunch.handlers.components.place/request-places-api])
+        (assoc-in db [:view :place-id] place-id))
+      db)))
+
+(re-frame/register-handler
   ::update-session-handler
   (fn [db _]
     (let [connection (-> db :view :connection)]
@@ -51,5 +60,6 @@
   (fn [db [_ params]]
     (let [session-id (:id params)]
       (dispatch [:api-session/connect :handle-session-connection session-id])
+      (dispatch [:api-session/session-metadata ::handle-session-metadata-response session-id])
       (assoc db :view {:session-id session-id}))))
 

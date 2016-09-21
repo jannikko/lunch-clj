@@ -18,6 +18,6 @@
     (reaction (get-in @db [:view :menu-link-input]))))
 
 (re-frame/register-sub
-  :detail-result
+  :place-contact
   (fn [db _]
-    (reaction (get-in @db [:view :detail-result]))))
+    (reaction (get-in @db [:view :place-contact]))))
