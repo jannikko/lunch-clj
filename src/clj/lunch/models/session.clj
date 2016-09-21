@@ -13,17 +13,10 @@
 (def connections (atom {}))
 (def counter (AtomicInteger.))
 
-(defn register-connection
-  [session-id conn]
-  (let [registered-conns (get @connections session-id)
-        updated-conns (conj registered-conns conn)]
-    (swap! connections assoc session-id updated-conns)))
 
-(defn watch-function
-  [session-id _key _ref old-value new-value]
-  (let [registered-conns (get @connections session-id)]
-    (log/debug "new value" new-value)
-    (doseq [conn registered-conns] (stream/put! conn (pr-str new-value)))))
+(defn get-connections
+  [session-id]
+  (get @connections session-id))
 
 (defn read-cache
   [session-id]
@@ -41,13 +34,20 @@
       (send session-cache #(assoc-in % [session-id :session-entries count] {:name name :lunch-order lunch-order}))
       count)))
 
+(defn register-connection
+  [session-id conn]
+  (let [registered-conns (get @connections session-id)
+        updated-conns (conj registered-conns conn)]
+    (swap! connections assoc session-id updated-conns)))
+
+
 (defn register-session
-  [place-id db]
+  [place-id watch-function]
   (let [session-id (str (UUID/randomUUID))]
     (do
-      (send session-cache #(assoc % session-id {:place-id place-id :session-entries {}}))
-      (add-watch session-cache session-id (partial watch-function session-id))
       (swap! connections assoc session-id [])
+      (add-watch session-cache session-id (partial watch-function session-id))
+      (send session-cache #(assoc % session-id {:place-id place-id :session-entries {}}))
       session-id)))
 
 (defn registered?

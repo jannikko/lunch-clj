@@ -11,13 +11,13 @@
 (defn add-stuff []
   (let [name-input (re-frame/subscribe [:lunch.subs.session/name-input])
         order-input (re-frame/subscribe [:lunch.subs.session/order-input])]
-  (fn []
-    [:div
-     [:input {:type      "text" :id "name" :placeholder "Name" :value @name-input
-              :on-change #(dispatch [:lunch.handlers.session/name-input-changed (-> % .-target .-value)])}]
-     [:input {:type "text" :id "order" :placeholder "Order" :value @order-input
-              :on-change #(dispatch [:lunch.handlers.session/order-input-changed (-> % .-target .-value)])}]
-     [:button {:on-click #(dispatch [:lunch.handlers.session/update-session-handler])}]])))
+    (fn []
+      [:div
+       [:input {:type      "text" :id "name" :placeholder "Name" :value @name-input
+                :on-change #(dispatch [:lunch.handlers.session/name-input-changed (-> % .-target .-value)])}]
+       [:input {:type      "text" :id "order" :placeholder "Order" :value @order-input
+                :on-change #(dispatch [:lunch.handlers.session/order-input-changed (-> % .-target .-value)])}]
+       [:button {:on-click #(dispatch [:lunch.handlers.session/update-session-handler])}]])))
 
 (defn session-state-view []
   (let [session-state (re-frame/subscribe [:session-state])]

@@ -15,13 +15,12 @@
 
 (defn send-update
   [connection update]
-  (go (>! connection update)))
+  (put! connection update))
 
 (re-frame/register-handler
   :handle-server-session-update
   (fn [db [_ session]]
-    (.log js/console "session" session)
-    (assoc-in db [:view :session-state] session)))
+    (assoc-in db [:view :session-state] (:message session))))
 
 (re-frame/register-handler
   :handle-session-connection
