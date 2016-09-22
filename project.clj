@@ -59,10 +59,10 @@
             :plugins        [[lein-figwheel "0.5.4-3"]]
             :main           lunch.user}
 
-   :prod   {:resource-paths ["src/config/prod"]
+   :uberjar   {:resource-paths ["src/config/prod"]
             :prep-tasks     [["cljsbuild" "once" "min"] "compile"]
             :uberjar-name   "lunch.jar"
-            :aot            [lunch.system lunch.server lunch.db]
+            :aot            :all
             :main           lunch.system}
 
    :client {:prep-tasks [["cljsbuild" "once" "dev"] "compile"]}
