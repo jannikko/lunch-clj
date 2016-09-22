@@ -18,4 +18,5 @@
 
 (defn -main [& args]
   (do (check-asserts true)
-      (component/start system)))
+      (component/start system)
+      @(promise)))
