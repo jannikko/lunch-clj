@@ -1,6 +1,7 @@
 (ns lunch.handler
   (:require [lunch.routes.menu :as menu-routes]
             [lunch.routes.session :as session-routes]
+            [lunch.routes.index :as index-routes]
             [ring.util.response :refer [resource-response content-type]]
             [lunch.exceptions :refer [application-exception-type application-exception?]]
             [compojure.core :refer :all]
@@ -19,6 +20,7 @@
 ;; Write general tests that use ring/mock for handler
 ;; Use clojurewerkz/route-one for bidirectional routing
 ;; Refactor responses to records -> view (business) objects
+;; Make most keywords namespaced (at least for client)
 
 (def CSRF-HEADER "x-csrf-token")
 
@@ -47,7 +49,7 @@
 (defn app-routes
   [db]
   (routes
-    (GET "/" [] (content-type (resource-response "index.html" {:root "public"}) "text/html"))
+    (GET "/" [] (index-routes/handler))
     (context "/api" []
       (context "/menu" [] (menu-routes/handler db))
       (context "/session" [] (session-routes/handler db)))

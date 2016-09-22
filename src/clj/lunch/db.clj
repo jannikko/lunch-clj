@@ -4,7 +4,8 @@
             [config.core :refer [env]]
             [clojure.spec :as s]
             [com.stuartsierra.component :as component]
-            [clojure.java.jdbc :as jdbc]))
+            [clojure.java.jdbc :as jdbc])
+  (:gen-class))
 
 (s/def ::connection #(instance? Connection %))
 (s/def ::valid-connection (s/keys :req-un [::connection]))

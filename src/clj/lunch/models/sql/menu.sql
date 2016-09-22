@@ -1,4 +1,4 @@
--- name: create-table
+-- name: create-table!
 -- Create the place table
 CREATE TABLE IF NOT EXISTS menu (
   id VARCHAR(255) PRIMARY KEY,

@@ -1,4 +1,4 @@
-(ns user
+(ns lunch.user
   (:require [com.stuartsierra.component :as component]
             [clojure.tools.namespace.repl :refer [refresh]]
             [clojure.spec :refer [check-asserts]]

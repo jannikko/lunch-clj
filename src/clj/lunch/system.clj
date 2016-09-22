@@ -3,14 +3,15 @@
             [lunch.db :refer [new-database]]
             [lunch.server :refer [new-server]]
             [clojure.spec :refer [check-asserts]]
-            [com.stuartsierra.component :as component]))
+            [com.stuartsierra.component :as component])
+  (:gen-class))
 
 (defn system-config
   [config]
   (component/system-map
     :database (new-database (:db config))
     :server (component/using
-              (new-server (:server config))
+              (new-server (:port config))
               [:database])))
 
 (def system (system-config env))

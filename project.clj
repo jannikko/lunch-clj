@@ -4,8 +4,9 @@
                  [org.clojure/core.async "0.2.374"]
                  [org.clojure/java.jdbc "0.6.2-alpha3"]
                  [org.clojure/test.check "0.9.0"]
-                 [org.clojure/tools.logging  "0.3.1"]
+                 [org.clojure/tools.logging "0.3.1"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
+                 [hiccup "1.0.5"]
                  [aleph "0.4.2-alpha8"]
                  [manifold "0.1.5"]
                  [jarohen/chord "0.7.0"]
@@ -31,9 +32,9 @@
                  [ring/ring-mock "0.3.0"]
                  [ring/ring-defaults "0.2.1"]]
 
-  :plugins [[lein-cljsbuild "1.1.3"]
+  :plugins [[lein-cljsbuild "1.1.4"]
             [cider/cider-nrepl "0.12.0"]
-            [lein-ring  "0.9.7"]
+            [lein-ring "0.9.7"]
             [lein-less "1.7.5"]]
 
   :min-lein-version "2.5.3"
@@ -53,13 +54,18 @@
          :target-path  "resources/public/css"}
 
   :profiles
-  {:dev
-   {:dependencies [[org.clojure/test.check "0.9.0"]]
-    :resource-paths ["src/config/dev"]
-    :plugins      [[lein-figwheel "0.5.4-3"]]
-    :main user
-    }
-   :client {:prep-tasks [["cljsbuild" "once" "min"] "compile"]}
+  {
+   :dev    {:resource-paths ["src/config/dev"]
+            :plugins        [[lein-figwheel "0.5.4-3"]]
+            :main           lunch.user}
+
+   :prod   {:resource-paths ["src/config/prod"]
+            :prep-tasks     [["cljsbuild" "once" "min"] "compile"]
+            :uberjar-name   "lunch.jar"
+            :aot            [lunch.system lunch.server lunch.db]
+            :main           lunch.system}
+
+   :client {:prep-tasks [["cljsbuild" "once" "dev"] "compile"]}
    }
 
   :cljsbuild
@@ -75,7 +81,7 @@
 
     {:id           "min"
      :source-paths ["src/cljs"]
-     :jar true
+     :jar          true
      :compiler     {:main            lunch.core
                     :output-to       "resources/public/js/compiled/app.js"
                     ;; advanced compilation not working yet 
@@ -85,7 +91,5 @@
 
     ]}
 
-  :main lunch.system
-
-  :uberjar-name "lunch.jar"
+  :clean-non-project-files false
   )

@@ -1,4 +1,4 @@
--- name: create-session-id
+-- name: create-session-id!
 -- Create the session_id table
 CREATE TABLE IF NOT EXISTS session_id (
   id UUID PRIMARY KEY,
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS session_id (
   place_id VARCHAR(255) NOT NULL
 );
 
--- name: create-session-entry
+-- name: create-session-entry!
 -- Create the session_entry table
 CREATE TABLE IF NOT EXISTS session_entry (
   id SERIAL PRIMARY KEY,

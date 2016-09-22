@@ -1,11 +1,11 @@
 {
- :server {:port 3500 :join? false}
- :db {:spec 
-      {:maximum-pool-size  1
-       :adapter            "postgresql"
-       :username           "lunch"
-       :database-name      "lunch"
-       :server-name        "localhost"
-       :port-number        5432}
-      }
+ :port "3500"
+ :db   {:spec
+        {:maximum-pool-size 1
+         :adapter           "postgresql"
+         :username          "lunch"
+         :database-name     "lunch"
+         :server-name       "localhost"
+         :port-number       5432}
+        }
  }

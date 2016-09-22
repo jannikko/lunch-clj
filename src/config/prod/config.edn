@@ -1,4 +1,11 @@
-{:port "80"
- :db-uri "postgresql://lunch:lunch@localhost/lunch"
- :file-storage {:type "remote" :url "example.com"}
+{
+ :db   {:spec
+        {:maximum-pool-size 1
+         :adapter           "postgresql"
+         :password          "nWKpGV_WYeLe4Hwr6ckPfs5P5Z"
+         :username          "ndajetqgdprkuv"
+         :database-name     "dd2qgg2841uku9"
+         :server-name       "ec2-54-243-199-79.compute-1.amazonaws.com"
+         :port-number       5432}
+        }
  }
