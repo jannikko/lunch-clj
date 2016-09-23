@@ -6,8 +6,6 @@
             [lunch.views.session :refer [session-panel]]
             [lunch.views.places-service :refer [places-service]]))
 
-;; TODO serve html from server to embed configuration such as api keys
-
 (defmulti panels identity)
 (defmethod panels :home-panel [] [home-panel])
 (defmethod panels :detail-panel [] [detail-panel])
@@ -21,6 +19,6 @@
 (defn main-panel []
   (let [active-panel (re-frame/subscribe [:active-panel])]
     (fn []
-      [:div
+      [:div {:class "container" :id "main-wrapper"}
        [places-service]
        [show-panel @active-panel]])))

@@ -6,22 +6,15 @@
             [clojure.string :refer [split]]))
 
 (defn detail-panel-render []
-  (let [menu-link (re-frame/subscribe [:menu-link])
-        menu-link-input (re-frame/subscribe [:menu-link-input])]
-    (fn []
-      [:div [place-contact]
-       [:div [:a {:href "#/"} "go to Home Page"]]
-       [:div [:label {:for "menu-link"} "Menu Link: "]
-        (if-not (some? @menu-link) [:input {:type         "text"
-                                            :value        @menu-link-input
-                                            :id           "menu-link"
-                                            :on-change    #(dispatch [:menu-link-input-changed (-> % .-target .-value)])
-                                            :on-key-press #(when (-> % .-charCode (= 13))
-                                                            (dispatch [:menu-link-input-submit])
-                                                            (-> % .-preventDefault))}]
-                                   [:a {:href @menu-link :id "menu-link"} @menu-link])]
-       [:button {:on-click #(dispatch [:generate-lunch-session])} "Generate Lunch Session"]
-       [place-map]])))
+  (fn []
+    [:div {:class "container"}
+     [place-contact]
+     [:div {:class "row pad"}
+      [:div {:class "col-lg-12"}
+       [:button {:class "btn btn-primary btn-lg btn-block" :on-click #(dispatch [:generate-lunch-session])} "Generate Lunch Session"]]]
+     [:div {:class "row"}
+      [:div {:class "col-lg-12"}
+       [place-map]]]]))
 
 (defn detail-panel-did-mount
   []

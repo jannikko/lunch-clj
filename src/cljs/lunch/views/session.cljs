@@ -13,18 +13,28 @@
   (let [name-input (re-frame/subscribe [:lunch.subs.session/name-input])
         order-input (re-frame/subscribe [:lunch.subs.session/order-input])]
     (fn []
-      [:div
-       [:form {:on-submit #(do (.preventDefault %)
-                               (dispatch [:lunch.handlers.session/update-session-handler]))}
-        [:input {:type      "text" :id "name" :placeholder "Name" :value @name-input
-                 :on-change #(dispatch [:lunch.handlers.session/name-input-changed (-> % .-target .-value)])}]
-        [:input {:type      "text" :id "order" :placeholder "Order" :value @order-input
-                 :on-change #(dispatch [:lunch.handlers.session/order-input-changed (-> % .-target .-value)])}]
-        [:input {:type "submit"}]]])))
+      [:div {:class "row"}
+       [:div {:class "col-lg-12"}
+        [:form {:class "input-group input-group-lg" :on-submit #(do (.preventDefault %) (dispatch [:lunch.handlers.session/update-session-handler]))}
+         [:div {:class "row row-no-padding"}
+          [:div {:class "col-lg-5"}
+           [:input {:type      "text" :id "name" :placeholder "Name" :value @name-input
+                    :class     "form-control input-lg"
+                    :on-change #(dispatch [:lunch.handlers.session/name-input-changed (-> % .-target .-value)])}]]
+          [:div {:class "col-lg-5"}
+           [:input {:type      "text" :id "order" :placeholder "Order" :value @order-input
+                    :class     "form-control input-lg"
+                    :on-change #(dispatch [:lunch.handlers.session/order-input-changed (-> % .-target .-value)])}]]
+          [:div {:class "col-lg-2"}
+           [:div {:class "form-group"}
+            [:input {:type "submit" :class "btn btn-primary btn-block"}]]]]]]])))
 
 (defn session-entry
   [entry]
-  [:div [:span (:name entry)] " " [:span (:lunch-order entry)]])
+  [:div {:class "row row-no-padding"}
+   [:div {:class "col-lg-5"} [:div {:class "card card-block"} [:p {:class "card-text"} (:name entry)]]]
+   [:div {:class "col-lg-5"} [:div {:class "card card-block"} [:p {:class "card-text"} (:lunch-order entry)]]]
+   [:div {:class "col-lg-2"}]])
 
 (defn session-state-view []
   (let [session-state (re-frame/subscribe [:session-state])]

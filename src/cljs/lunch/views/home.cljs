@@ -8,12 +8,12 @@
 (defn search-result-entry
   [{:keys [place_id name formatted_address]}]
   [:div
-   [:a {:href (detail-route {:id place_id})} name " " formatted_address]])
+   [:a {:class "list-group-item" :href (detail-route {:id place_id})} name " " formatted_address]])
 
 (defn search-results []
   (let [result (re-frame/subscribe [:search-result])]
     (fn []
-      (into [:div] (map search-result-entry @result)))))
+      (into [:div {:class "list-group"}] (map search-result-entry @result)))))
 
 
 (defn home-panel-did-mount []
@@ -23,11 +23,14 @@
 (defn home-panel-render []
   (let [query (re-frame/subscribe [:query])]
     (fn []
-      [:div [:h1 "What would you like to eat today?"]
-       [:div [:input {:type "text" :value @query :on-change #(dispatch [:search-input-changed (-> % .-target .-value)])}]
-        [:button {:value "Location" :on-click #(dispatch [:location-request])} "My Location"]
-        [search-results]]
-       ])))
+      [:div {:class "jumbotron vertical-center" :id "home"}
+       [:div {:class "container"}
+        [:div {:class "input-group"}
+         [:input {:class "form-control" :placeholder "Where would you like to eat today?" :type "text" :value @query :on-change #(dispatch [:search-input-changed (-> % .-target .-value)])}]
+         [:span {:class "input-group-btn"}
+          [:button {:class "btn btn-default" :type "button" :value "Location" :on-click #(dispatch [:location-request])} "My Location"]]]
+        [search-results]]]
+      )))
 
 
 (defn home-panel []

@@ -6,6 +6,7 @@
                  [org.clojure/test.check "0.9.0"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
+                 [jarohen/chime "0.1.9"]
                  [hiccup "1.0.5"]
                  [aleph "0.4.2-alpha8"]
                  [manifold "0.1.5"]
@@ -35,7 +36,7 @@
   :plugins [[lein-cljsbuild "1.1.4"]
             [cider/cider-nrepl "0.12.0"]
             [lein-ring "0.9.7"]
-            [lein-less "1.7.5"]]
+            [lein-sassy "1.0.7"]]
 
   :min-lein-version "2.5.3"
 
@@ -50,22 +51,22 @@
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
-  :less {:source-paths ["less"]
-         :target-path  "resources/public/css"}
+  :sass {:src "sass"
+         :dst "resources/public/css"}
 
   :profiles
   {
-   :dev    {:resource-paths ["src/config/dev"]
-            :plugins        [[lein-figwheel "0.5.4-3"]]
-            :main           lunch.user}
+   :dev     {:resource-paths ["src/config/dev"]
+             :plugins        [[lein-figwheel "0.5.4-3"]]
+             :main           lunch.user}
 
-   :uberjar   {:resource-paths ["src/config/prod"]
-            :prep-tasks     [["cljsbuild" "once" "min"] "compile"]
-            :uberjar-name   "lunch.jar"
-            :aot            :all
-            :main           lunch.system}
+   :uberjar {:resource-paths ["src/config/prod"]
+             :prep-tasks     [["cljsbuild" "once" "min"] ["sass" "once"] "compile"]
+             :uberjar-name   "lunch.jar"
+             :aot            :all
+             :main           lunch.system}
 
-   :client {:prep-tasks [["cljsbuild" "once" "dev"] "compile"]}
+   :client  {:prep-tasks [["cljsbuild" "once" "dev"] ["sass" "once"] "compile"]}
    }
 
   :cljsbuild

@@ -38,11 +38,9 @@
 
 (defn register-connection
   [session-id conn]
-  (let [registered-conns (get @connections session-id)
-        conn-id (str (UUID/randomUUID))
-        updated-conns (assoc registered-conns conn-id conn)]
+  (let [conn-id (str (UUID/randomUUID))]
     (stream/on-closed conn (partial close-connection session-id conn-id))
-    (swap! connections assoc session-id updated-conns)))
+    (swap! connections assoc-in [session-id conn-id] conn)))
 
 
 (defn register-session

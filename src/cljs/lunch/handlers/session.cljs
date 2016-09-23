@@ -53,7 +53,7 @@
     (let [connection (-> db :view :connection)]
       (when connection (send-update connection {:name (-> db :view :name-input)
                                                 :lunch-order (-> db :view :order-input)}))
-      db)))
+      (-> db (assoc-in [:view :name-input] "") (assoc-in [:view :order-input] "")))))
 
 (re-frame/register-handler
   :initialize-session-view
