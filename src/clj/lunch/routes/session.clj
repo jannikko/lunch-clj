@@ -3,6 +3,7 @@
             [clojure.spec :as s]
             [clojure.edn :as edn]
             [clojure.tools.logging :as log]
+            [clojure.core.async :as a :refer [<! go]]
             [manifold.stream :as stream]
             [manifold.deferred :as d]
             [aleph.http :as http]
@@ -13,6 +14,12 @@
             [lunch.models.session :as session-model]
             [ring.util.http-response :as res]
             [compojure.core :refer :all]))
+
+(defn schedule-session-removal
+  [session-id]
+  (go
+    (<! (a/timeout (-> 1000 (* 3600) (* 24))))
+    (session-model/delete-session session-id)))
 
 (defn watch-function
   [session-id _key _ref old-value new-value]
@@ -32,6 +39,7 @@
   {:pre [(s/assert :lunch.routes.session.generate/request request)]}
   (let [place-id (get-in request [:body :place-id])
         session-id (session-model/register-session place-id watch-function)]
+    (schedule-session-removal session-id)
     (res/created (str session-id))))
 
 (defn get-session-metadata

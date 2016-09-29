@@ -6,7 +6,6 @@
                  [org.clojure/test.check "0.9.0"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
-                 [jarohen/chime "0.1.9"]
                  [hiccup "1.0.5"]
                  [aleph "0.4.2-alpha8"]
                  [manifold "0.1.5"]

@@ -20,6 +20,10 @@
   [session-id]
   (get @connections session-id))
 
+(defn delete-connection
+  [session-id]
+  (swap! connections dissoc session-id))
+
 (defn read-cache
   [session-id]
   (get @session-cache session-id))
@@ -35,6 +39,10 @@
     (let [count (.incrementAndGet counter)]
       (send session-cache #(assoc-in % [session-id :session-entries count] {:name name :lunch-order lunch-order}))
       count)))
+
+(defn delete-cache
+  [session-id]
+  (send session-cache #(dissoc % session-id)))
 
 (defn register-connection
   [session-id conn]
@@ -55,3 +63,8 @@
 (defn registered?
   [session-id]
   (contains? @session-cache session-id))
+
+(defn delete-session
+  [session-id]
+  (do (delete-connection session-id)
+      (delete-cache session-id)))
