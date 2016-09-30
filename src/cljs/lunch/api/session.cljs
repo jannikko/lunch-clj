@@ -26,7 +26,7 @@
   :api-session/connect
   (fn
     [db [_ callback session-id]]
-    (go (let [{:keys [ws-channel error]} (<! (ws-ch (str "ws://" (.. js/window -location -host) "/api/session/" session-id "/connect")))]
+    (go (let [{:keys [ws-channel error]} (<! (ws-ch (str "wss://" (.. js/window -location -host) "/api/session/" session-id "/connect")))]
         (if-not error
           (dispatch [callback ws-channel]))))
     db))
