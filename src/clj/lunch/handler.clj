@@ -8,6 +8,7 @@
             [compojure.route :as route]
             [clojure.tools.logging :as log]
             [ring.util.http-response :as res]
+            [config.core :refer [env]]
             [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
             [ring.middleware.anti-forgery :refer [*anti-forgery-token* wrap-anti-forgery]]
             [ring.middleware.session :refer [wrap-session]]
@@ -53,7 +54,7 @@
     (context "/api" []
       (context "/menu" [] (menu-routes/handler db))
       (context "/session" [] (session-routes/handler db)))
-    (GET "/.well-known/acme-challenge/:id" (content-type (res/ok "DueOnp24BPCgweEKZ6M0JnzZ69bT647HhDQXpfBR7kk.7j2TCtjO_bcQAArJJmtV14fJys2UtMOaOze4G-grakk") "text/plain"))
+    (GET "/.well-known/acme-challenge/:id" [id] (fn [request] (content-type (res/ok (:cert-challenge env)) "text/plain")))
     (route/resources "/")
     (route/not-found "Page not found")))
 
