@@ -7,4 +7,5 @@
  :db-name              "lunch"
  :db-server-name       "localhost"
  :db-port-number       5432
+ :ws-protocol          "ws"
  }

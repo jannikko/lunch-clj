@@ -1,6 +1,7 @@
 (ns lunch.routes.index
   (:require [hiccup.page :refer [html5 include-css include-js]]
             [config.core :refer [env]]
+            [cheshire.core :as json]
             [hiccup.element :refer [javascript-tag]]))
 
 (defn handler []
@@ -29,4 +30,5 @@
                     :crossorigin "anonymous"}]
           (include-js "https://maps.googleapis.com/maps/api/js?key=AIzaSyCDbcLwR97CQ5xrMxYGWo5H1kL4tN3VJjQ&libraries=places")
           (include-js "js/compiled/app.js")
+          (javascript-tag (str "var SERVER_CONFIG = " (json/generate-string (select-keys env [:ws-protocol]))))
           (javascript-tag "lunch.core.init()")]))
