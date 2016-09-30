@@ -21,7 +21,13 @@
 
 (defn new-database
   [config]
-  (map->Database {:spec (:spec config)}))
+  (map->Database {:spec {:maximum-pool-size (:db-maximum-pool-size config)
+                         :adapter           (:db-adapter config)
+                         :username          (:db-username config)
+                         :password          (:db-password config)
+                         :database-name     (:db-name config)
+                         :server-name       (:db-server-name config)
+                         :port-number       (:db-port-number config)}}))
 
 (defn get-datasource
   [db]

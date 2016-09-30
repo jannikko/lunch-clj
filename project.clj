@@ -65,6 +65,8 @@
              :aot            :all
              :main           lunch.system}
 
+   :local {:resource-paths ["src/config/dev"]}
+
    :client  {:prep-tasks [["cljsbuild" "once" "dev"] ["sass" "once"] "compile"]}
    }
 

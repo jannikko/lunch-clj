@@ -9,4 +9,3 @@ out
 *.#
 /.cljs_rhino_repl
 /.idea
-/lunch/config/prod/config.edn

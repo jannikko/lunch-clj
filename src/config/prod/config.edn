@@ -1,0 +1,4 @@
+{
+ :db-maximum-pool-size 1
+ :db-adapter           "postgresql"
+ }

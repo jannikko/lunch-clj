@@ -14,5 +14,5 @@
     (assoc component :server nil)))
 
 (defn new-server
-  [port]
-  (map->Server {:port port}))
+  [config]
+  (map->Server {:port (:port config)}))

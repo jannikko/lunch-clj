@@ -9,9 +9,9 @@
 (defn system-config
   [config]
   (component/system-map
-    :database (new-database (:db config))
+    :database (new-database config)
     :server (component/using
-              (new-server (:port config))
+              (new-server config)
               [:database])))
 
 (def system (system-config env))

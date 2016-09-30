@@ -1,11 +1,10 @@
 {
- :port "3500"
- :db   {:spec
-        {:maximum-pool-size 1
-         :adapter           "postgresql"
-         :username          "lunch"
-         :database-name     "lunch"
-         :server-name       "localhost"
-         :port-number       5432}
-        }
+ :port              "3500"
+ :db-maximum-pool-size 1
+ :db-adapter        "postgresql"
+ :db-username       "lunch"
+ :db-password       nil
+ :db-name           "lunch"
+ :db-server-name    "localhost"
+ :db-port-number    5432
  }
