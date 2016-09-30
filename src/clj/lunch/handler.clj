@@ -53,6 +53,7 @@
     (context "/api" []
       (context "/menu" [] (menu-routes/handler db))
       (context "/session" [] (session-routes/handler db)))
+    (GET "/.well-known/acme-challenge/:id" (content-type (res/ok "DueOnp24BPCgweEKZ6M0JnzZ69bT647HhDQXpfBR7kk.7j2TCtjO_bcQAArJJmtV14fJys2UtMOaOze4G-grakk") "text/plain"))
     (route/resources "/")
     (route/not-found "Page not found")))
 
