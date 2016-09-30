@@ -79,3 +79,4 @@ lein cljsbuild once min
 - Move out some of the logic that currently lives inside of the routes to be in a seperate controller folder
 - Store sessions asynchonously in the database 
 - Return an asynchronous result when querying the database, so that the thread is not blocked
+- Write more tests for session route and model
