@@ -84,11 +84,11 @@
      :jar          true
      :compiler     {:main            lunch.core
                     :output-to       "resources/public/js/compiled/app.js"
-                    ;; advanced compilation not working yet 
-                    :optimizations   :whitespace
+                    :externs         ["externs/google_maps_api_v3.js"]
+                    :optimizations   :advanced
                     :closure-defines {goog.DEBUG false}
-                    :pretty-print    false}}
-
+                    :pretty-print    false}
+     }
     ]}
 
   :clean-non-project-files false

@@ -12,7 +12,7 @@
 (def connections (atom {}))
 (def counter (AtomicInteger.))
 
-(defn close-connection
+(defn delete-connection
   [session-id conn-id & args]
   (do (swap! connections update-in [session-id] dissoc conn-id)))
 
@@ -20,7 +20,7 @@
   [session-id]
   (get @connections session-id))
 
-(defn delete-connection
+(defn delete-connections
   [session-id]
   (swap! connections dissoc session-id))
 
@@ -47,7 +47,7 @@
 (defn register-connection
   [session-id conn]
   (let [conn-id (str (UUID/randomUUID))]
-    (stream/on-closed conn (partial close-connection session-id conn-id))
+    (stream/on-closed conn (partial delete-connection session-id conn-id))
     (swap! connections assoc-in [session-id conn-id] conn)))
 
 
@@ -66,5 +66,5 @@
 
 (defn delete-session
   [session-id]
-  (do (delete-connection session-id)
+  (do (delete-connections session-id)
       (delete-cache session-id)))

@@ -19,6 +19,8 @@
   [session-id]
   (go
     (<! (a/timeout (-> 1000 (* 3600) (* 24))))
+    (doseq [conn (-> session-id (session-model/get-connections) (vals))]
+      (when-not (stream/closed? conn) (stream/close! conn)))
     (session-model/delete-session session-id)))
 
 (defn watch-function
