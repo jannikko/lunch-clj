@@ -80,3 +80,4 @@ lein cljsbuild once min
 - Store sessions asynchonously in the database 
 - Return an asynchronous result when querying the database, so that the thread is not blocked
 - Write more tests for session route and model
+- Create 404 Page and redirect to it
